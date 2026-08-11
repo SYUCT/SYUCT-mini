@@ -1,0 +1,41 @@
+<!-- pages/preview/preview.wxml -->
+<view class="preview-page">
+  <view class="preview-toolbar">
+    <view class="preview-title">{{title}}</view>
+    <view class="preview-counter">{{currentPage}} / {{totalPages}}</view>
+  </view>
+
+  <swiper
+    class="preview-swiper"
+    current="{{currentIndex}}"
+    bindchange="onPageChange"
+    duration="220"
+    easing-function="easeOutCubic"
+  >
+    <swiper-item wx:for="{{pages}}" wx:key="number">
+      <scroll-view
+        class="preview-sheet"
+        scroll-y
+        enhanced="{{true}}"
+        show-scrollbar="{{false}}"
+      >
+        <image
+          wx:if="{{item.src}}"
+          class="preview-img"
+          src="{{item.src}}"
+          mode="widthFix"
+          bindtap="previewCurrent"
+          binderror="onImageError"
+          show-menu-by-longpress="{{true}}"
+        />
+        <view wx:else class="preview-loading">准备第 {{item.display}} 页…</view>
+      </scroll-view>
+    </swiper-item>
+  </swiper>
+
+  <view class="preview-actions">
+    <button class="preview-button" disabled="{{!canPrev}}" bindtap="goPrev">上一页</button>
+    <view class="preview-hint">左右翻页 · 点击图片放大</view>
+    <button class="preview-button" disabled="{{!canNext}}" bindtap="goNext">下一页</button>
+  </view>
+</view>

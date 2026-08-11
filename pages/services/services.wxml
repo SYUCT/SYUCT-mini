@@ -1,0 +1,32 @@
+<view class="page">
+  <landmark-hero
+    title="{{pageInfo.title}}"
+    subtitle="{{pageInfo.subtitle}}"
+    source-version="{{site.sourceVersion}}"
+    landmark="{{pageInfo.landmark}}"
+    bindlandmarktap="openLandmark"
+  />
+
+  <view class="section-block" wx:for="{{categories}}" wx:key="id" wx:for-item="cat" id="{{cat.id}}">
+    <view class="section-block-title"><text class="section-block-icon">{{cat.icon}}</text><text>{{cat.name}}</text></view>
+    <view class="section-block-lead" wx:if="{{cat.lead}}">{{cat.lead}}</view>
+    <view class="callout compact" wx:if="{{cat.preCallout}}">{{cat.preCallout}}</view>
+    <view class="section-card">
+      <view class="list-row" wx:for="{{cat.items}}" wx:key="id" wx:for-item="doc" bindtap="openDoc" data-file="{{doc.file}}" data-title="{{doc.title}}">
+        <view class="list-icon">📄</view>
+        <view class="list-main">
+          <view class="list-title">{{doc.title}}</view>
+          <view class="doc-description">{{doc.description}}</view>
+          <view class="doc-meta">{{doc.note}}</view>
+        </view>
+        <view class="list-arrow">›</view>
+      </view>
+    </view>
+    <view class="section-block-lead section-post-note" wx:if="{{cat.postNote}}">{{cat.postNote}}</view>
+    <view class="callout compact" wx:if="{{cat.postCallout}}">{{cat.postCallout}}</view>
+    <view class="callout warning compact" wx:if="{{cat.postWarning}}">{{cat.postWarning}}</view>
+  </view>
+
+  <view class="callout warning">办理提示：{{pageInfo.finalTip}}</view>
+  <view class="page-footer">表格版本和审批流程以相关部门当期要求为准</view>
+</view>

@@ -1,0 +1,43 @@
+<view class="page">
+  <landmark-hero
+    id="landmarks"
+    title="{{campus.title}}"
+    subtitle="{{campus.subtitle}}"
+    source-version="{{site.sourceVersion}}"
+    landmark="{{campus.landmark}}"
+    bindlandmarktap="openLandmark"
+  />
+
+  <view class="section-block" wx:for="{{sections}}" wx:key="id" wx:for-item="section" id="{{section.id}}">
+    <view class="section-block-title"><text class="section-block-icon">{{section.icon}}</text><text>{{section.name}}</text></view>
+    <view class="section-block-lead" wx:if="{{section.lead}}">{{section.lead}}</view>
+    <view class="callout compact" wx:if="{{section.preCallout}}">{{section.preCallout}}</view>
+    <view class="section-card">
+      <view class="list-row" wx:for="{{section.items}}" wx:key="id" wx:for-item="doc" bindtap="openDoc" data-file="{{doc.file}}" data-title="{{doc.title}}">
+        <view class="list-icon">📄</view>
+        <view class="list-main">
+          <view class="list-title">{{doc.title}}</view>
+          <view class="doc-description">{{doc.description}}</view>
+          <view class="doc-meta">{{doc.note}}</view>
+        </view>
+        <view class="list-arrow">›</view>
+      </view>
+    </view>
+    <view class="section-block-lead section-post-note" wx:if="{{section.postNote}}">{{section.postNote}}</view>
+    <view class="callout compact" wx:if="{{section.postCallout}}">{{section.postCallout}}</view>
+    <view class="callout warning compact" wx:if="{{section.postWarning}}">{{section.postWarning}}</view>
+  </view>
+
+  <view class="section-block" id="photos">
+    <view class="section-block-title"><text>📷</text><text>校园相册</text></view>
+    <view class="section-block-lead">在资料之外，也看看真实的校园。</view>
+  </view>
+  <view class="gallery-grid">
+    <view class="gallery-item" wx:for="{{campus.gallery}}" wx:key="img" bindtap="previewImage" data-index="{{item.viewerIndex}}">
+      <image class="gallery-img" src="{{item.file}}" mode="aspectFill" lazy-load="{{true}}" />
+      <view class="gallery-label">{{item.label}}</view>
+    </view>
+  </view>
+
+  <view class="page-footer">校历、体育和假期安排以当期正式通知为准</view>
+</view>

@@ -1,0 +1,63 @@
+<!-- pages/resources/resources.wxml -->
+<view class="page">
+  <view class="page-head">
+    <view class="page-title">📥 资料下载</view>
+    <view class="page-sub">共 {{flatCount}} 份资料 · 标题、分类与说明依据网页版 {{site.sourceVersion}}</view>
+  </view>
+
+  <view class="search-wrap">
+    <view class="search-bar">
+      <text class="search-icon">⌕</text>
+      <input
+        class="search-input"
+        placeholder="搜索名称、分类、格式或关键词"
+        value="{{keyword}}"
+        bindinput="onSearchInput"
+        bindconfirm="onSearchConfirm"
+        confirm-type="search"
+      />
+      <view wx:if="{{keyword}}" class="search-clear" bindtap="clearSearch">×</view>
+    </view>
+    <view class="search-summary" wx:if="{{keyword}}">找到 {{resultCount}} 份相关资料</view>
+  </view>
+
+  <block wx:if="{{categories.length > 0}}">
+    <view class="cat-card" wx:for="{{categories}}" wx:key="cat" wx:for-item="cat">
+      <view class="cat-head">
+        <text class="cat-name">{{cat.cat}}</text>
+        <text class="cat-count">{{cat.items.length}} 项</text>
+      </view>
+      <view class="doc-list">
+        <view
+          class="list-row"
+          wx:for="{{cat.items}}"
+          wx:key="id"
+          wx:for-item="doc"
+          bindtap="openDoc"
+          data-file="{{doc.file}}"
+          data-title="{{doc.title}}"
+        >
+          <view class="list-icon">📄</view>
+          <view class="list-main">
+            <view class="list-title">{{doc.title}}</view>
+            <view class="doc-description">{{doc.description}}</view>
+            <view class="doc-meta">{{doc.note}}</view>
+          </view>
+          <view class="list-arrow">›</view>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <view class="empty" wx:else>没有找到「{{keyword}}」相关的资料</view>
+
+  <view class="card site-link" bindtap="openSite">
+    <view class="list-main">
+      <view class="list-title">💻 网页版资料中心</view>
+      <view class="list-desc">查看网页端最新栏目、完整在线预览与更新记录</view>
+    </view>
+    <view class="list-arrow">↗</view>
+  </view>
+
+  <view class="contribute-tip">📮 投稿请加首页群聊</view>
+</view>

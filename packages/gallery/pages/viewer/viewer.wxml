@@ -1,0 +1,30 @@
+<view class="gallery-page">
+  <view class="gallery-head">
+    <view class="gallery-title">{{currentTitle}}</view>
+    <view class="gallery-counter">{{currentNumber}} / {{total}}</view>
+  </view>
+
+  <swiper
+    class="gallery-swiper"
+    current="{{current}}"
+    bindchange="onChange"
+    duration="220"
+    easing-function="easeOutCubic"
+  >
+    <swiper-item wx:for="{{gallery}}" wx:key="src">
+      <view class="gallery-stage">
+        <image
+          class="gallery-full"
+          src="{{item.src}}"
+          mode="aspectFit"
+          lazy-load="{{true}}"
+          bindtap="previewCurrent"
+          data-index="{{index}}"
+          show-menu-by-longpress="{{true}}"
+        />
+      </view>
+    </swiper-item>
+  </swiper>
+
+  <view class="gallery-foot">左右滑动切换 · 点击图片可进入微信原生大图缩放</view>
+</view>

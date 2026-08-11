@@ -1,0 +1,105 @@
+/* pages/about/about.wxss */
+.about-hero {
+  text-align: center;
+  padding: 60rpx 40rpx;
+  background: linear-gradient(160deg, #075ca8 0%, #1f6feb 100%);
+  color: #fff;
+  border-radius: 24rpx;
+  margin: 24rpx;
+  box-shadow: 0 8rpx 24rpx rgba(7, 92, 168, 0.25);
+}
+
+.about-logo {
+  font-size: 80rpx;
+}
+
+.about-name {
+  font-size: 44rpx;
+  font-weight: 800;
+  margin-top: 16rpx;
+}
+
+.about-en {
+  font-size: 26rpx;
+  opacity: 0.85;
+  margin-top: 8rpx;
+  letter-spacing: 2rpx;
+}
+
+.about-badge {
+  display: inline-block;
+  margin-top: 20rpx;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 8rpx 28rpx;
+  border-radius: 999rpx;
+  font-size: 24rpx;
+}
+
+.about-version {
+  font-size: 22rpx;
+  opacity: 0.8;
+  margin-top: 20rpx;
+}
+
+.about-text {
+  font-size: 26rpx;
+  line-height: 1.8;
+  color: var(--text);
+  margin-top: 12rpx;
+}
+
+.about-text.warn {
+  background: rgba(210, 153, 29, 0.08);
+  border-left: 6rpx solid var(--accent);
+  padding: 16rpx 20rpx;
+  border-radius: 8rpx;
+  margin-top: 20rpx;
+  color: #8a6d1a;
+}
+
+.footer-note {
+  text-align: center;
+  font-size: 24rpx;
+  color: var(--text-secondary);
+  padding: 40rpx 0 8rpx;
+}
+
+.footer-update {
+  text-align: center;
+  font-size: 24rpx;
+  color: var(--accent);
+  font-weight: 600;
+  padding: 0 0 60rpx;
+}
+
+.about-page-head {
+  padding-top: 16rpx;
+}
+
+.source-item {
+  margin-top: 0;
+  color: var(--text);
+}
+
+/* 交流群操作按钮 */
+.group-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10rpx;
+  flex-shrink: 0;
+  margin-left: 12rpx;
+}
+
+.group-btn {
+  font-size: 22rpx;
+  font-weight: 600;
+  padding: 10rpx 22rpx;
+  border-radius: 999rpx;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.group-btn-copy {
+  background: rgba(7, 92, 168, 0.08);
+  color: var(--primary);
+}
