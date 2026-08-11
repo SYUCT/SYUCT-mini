@@ -491,7 +491,7 @@ def check_landmarks_and_main_package() -> None:
         if '<landmark-hero' not in text or 'bindlandmarktap="openLandmark"' not in text:
             fail(f'{rel} 未接入统一地标页首')
 
-    ignored_dirs = {ROOT / 'scripts', ROOT / 'pages' / 'preview'}
+    ignored_dirs = {ROOT / 'scripts', ROOT / 'pages' / 'preview', ROOT / '.git'}
     ignored_files = {
         ROOT / 'README.md', ROOT / '.gitignore', ROOT / 'project.private.config.json'
     }
