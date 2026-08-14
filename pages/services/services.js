@@ -3,7 +3,9 @@ const { openDoc } = require('../../utils/doc');
 const { getSectionGroups } = require('../../data/documents');
 const { captureTarget, scrollToTarget } = require('../../utils/page');
 
-Page({
+const { withShare } = require('../../utils/share');
+
+Page(Object.assign({
   data: {
     pageInfo: SERVICES,
     site: SITE,
@@ -30,4 +32,4 @@ Page({
     const { file, title } = e.currentTarget.dataset;
     openDoc(file, title);
   }
-});
+}, withShare()));

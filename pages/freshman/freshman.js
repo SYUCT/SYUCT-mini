@@ -3,7 +3,9 @@ const { getSectionGroups } = require('../../data/documents');
 const { openDoc } = require('../../utils/doc');
 const { captureTarget, scrollToTarget } = require('../../utils/page');
 
-Page({
+const { withShare } = require('../../utils/share');
+
+Page(Object.assign({
   data: {
     fresh: FRESHMAN,
     guide: getSectionGroups('freshman')[0],
@@ -42,4 +44,4 @@ Page({
     if (!link) return;
     wx.navigateTo({ url: link });
   }
-});
+}, withShare()));

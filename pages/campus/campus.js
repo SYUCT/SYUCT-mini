@@ -3,7 +3,9 @@ const { getSectionGroups } = require('../../data/documents');
 const { openDoc } = require('../../utils/doc');
 const { captureTarget, scrollToTarget } = require('../../utils/page');
 
-Page({
+const { withShare } = require('../../utils/share');
+
+Page(Object.assign({
   data: {
     campus: CAMPUS,
     site: SITE,
@@ -38,4 +40,4 @@ Page({
     const { file, title } = e.currentTarget.dataset;
     openDoc(file, title);
   }
-});
+}, withShare()));

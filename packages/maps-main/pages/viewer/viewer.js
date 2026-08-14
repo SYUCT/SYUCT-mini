@@ -1,3 +1,4 @@
+const { withShare } = require('../../../../utils/share');
 const MAPS = {
   'campus-map': { id: 'campus-map', title: '高清校园总图', src: '/packages/maps-main/assets/campus-map.jpg', resolution: '1453 × 2048', format: 'JPG' },
   'sports-map': { id: 'sports-map', title: '体育课专用地图', src: '/packages/maps-main/assets/sports-map.png', resolution: '1455 × 2048', format: 'PNG' }
@@ -8,7 +9,7 @@ const MIN_SCALE = 1;
 const MAX_SCALE = 5;
 const SCALE_STEP = 0.5;
 
-Page({
+Page(Object.assign({
   data: {
     map: DEFAULT_MAP,
     scale: MIN_SCALE,
@@ -73,4 +74,4 @@ Page({
   onUnload() {
     clearTimeout(this.scaleSyncTimer);
   }
-});
+}, withShare()));

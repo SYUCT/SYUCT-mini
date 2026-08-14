@@ -1,3 +1,4 @@
+const { withShare } = require('../../../../utils/share');
 const MAPS = {
   'delivery-pickup-overview': { id: 'delivery-pickup-overview', title: '快递取件位置总览', src: '/packages/maps-delivery/assets/delivery-pickup-overview.jpg', resolution: '1448 × 1086', format: 'JPG' },
   'delivery-haochijie-layout': { id: 'delivery-haochijie-layout', title: '化大好吃街内部点位', src: '/packages/maps-delivery/assets/delivery-haochijie-layout.jpg', resolution: '1672 × 941', format: 'JPG' }
@@ -8,7 +9,7 @@ const MIN_SCALE = 1;
 const MAX_SCALE = 5;
 const SCALE_STEP = 0.5;
 
-Page({
+Page(Object.assign({
   data: {
     map: DEFAULT_MAP,
     scale: MIN_SCALE,
@@ -73,4 +74,4 @@ Page({
   onUnload() {
     clearTimeout(this.scaleSyncTimer);
   }
-});
+}, withShare()));

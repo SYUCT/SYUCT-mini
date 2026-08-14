@@ -1,3 +1,4 @@
+const { withShare } = require('../../../../utils/share');
 const GALLERY = [
   { title: '林荫小路', src: '/packages/gallery/assets/gallery-tree-path.jpg' },
   { title: '雨后晚霞广场', src: '/packages/gallery/assets/gallery-campus-dusk.jpg' },
@@ -14,7 +15,7 @@ const GALLERY = [
   { title: '金字塔夜景', src: '/packages/gallery/assets/gallery-campus-night.jpg' }
 ];
 
-Page({
+Page(Object.assign({
   data: {
     gallery: GALLERY,
     current: 0,
@@ -54,4 +55,4 @@ Page({
       urls: GALLERY.map(image => image.src)
     });
   }
-});
+}, withShare()));

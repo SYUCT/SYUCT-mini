@@ -2,6 +2,8 @@ const { MAP, MAPS, PLACES, SITE } = require('../../data/content');
 const { openUrl } = require('../../utils/doc');
 const { captureTarget, scrollToTarget } = require('../../utils/page');
 
+const { withShare } = require('../../utils/share');
+
 const VIEWER_ROUTES = {
   'campus-map': '/packages/maps-main/pages/viewer/viewer',
   'sports-map': '/packages/maps-main/pages/viewer/viewer',
@@ -16,7 +18,7 @@ const FALLBACK_IMAGES = {
   'delivery-haochijie-layout': '/assets/delivery-haochijie-layout.jpg'
 };
 
-Page({
+Page(Object.assign({
   data: {
     pageInfo: MAP,
     maps: MAPS,
@@ -56,4 +58,4 @@ Page({
   openPanorama() {
     openUrl(this.data.site.panoramaUrl, '学校官方校园全景需要在浏览器中打开。是否复制链接？');
   }
-});
+}, withShare()));

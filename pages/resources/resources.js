@@ -7,13 +7,15 @@ const {
   documentMatches
 } = require('../../data/documents');
 
+const { withShare } = require('../../utils/share');
+
 const ALL_GROUPS = getResourceGroups();
 
 function countItems(groups) {
   return groups.reduce((total, group) => total + group.items.length, 0);
 }
 
-Page({
+Page(Object.assign({
   data: {
     categories: ALL_GROUPS,
     site: SITE,
@@ -91,4 +93,4 @@ Page({
       '网页版资料中心支持完整在线预览。是否复制链接到浏览器访问？'
     );
   }
-});
+}, withShare()));

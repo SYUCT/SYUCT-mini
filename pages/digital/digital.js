@@ -3,12 +3,14 @@ const { getSectionGroups } = require('../../data/documents');
 const { openDoc, openUrl } = require('../../utils/doc');
 const { captureTarget, scrollToTarget } = require('../../utils/page');
 
+const { withShare } = require('../../utils/share');
+
 const sections = getSectionGroups('digital').map(section => ({
   ...section,
   action: DIGITAL.actions[section.id] || null
 }));
 
-Page({
+Page(Object.assign({
   data: {
     digital: DIGITAL,
     site: SITE,
@@ -38,4 +40,4 @@ Page({
     const { url, title } = e.currentTarget.dataset;
     openUrl(url, `${title} 需要在浏览器中访问；校内系统可能需要连接校园网或 WebVPN。是否复制链接？`);
   }
-});
+}, withShare()));

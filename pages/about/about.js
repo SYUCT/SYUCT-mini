@@ -1,6 +1,8 @@
 const { SITE, ABOUT, COMMUNITY_GROUPS } = require('../../data/content');
 
-Page({
+const { withShare } = require('../../utils/share');
+
+Page(Object.assign({
   data: {
     site: SITE,
     about: ABOUT,
@@ -23,4 +25,4 @@ Page({
   openRepo() {
     getApp().openWeb(this.data.site.repoUrl, '是否复制 GitHub 仓库链接到浏览器打开？');
   }
-});
+}, withShare()));

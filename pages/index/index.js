@@ -1,6 +1,8 @@
 const { SITE, HOME, PORTALS, STATS, QUICK_QUESTIONS, COMMUNITY_GROUPS } = require('../../data/content');
 
-Page({
+const { withShare } = require('../../utils/share');
+
+Page(Object.assign({
   data: {
     site: SITE,
     home: HOME,
@@ -60,4 +62,4 @@ Page({
   },
 
   preventBubble() {}
-});
+}, withShare()));

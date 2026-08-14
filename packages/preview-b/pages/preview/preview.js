@@ -2,6 +2,8 @@
 // 使用单页 swiper，并仅为当前页前后各两页设置图片 src，降低长文档内存占用。
 const PREVIEWS = require('../../../../data/previews.js');
 
+const { withShare } = require('../../../../utils/share');
+
 const WINDOW_RADIUS = 2;
 
 function padPage(value) {
@@ -16,7 +18,7 @@ function pageOffset(meta, partIndex) {
   return meta.ranges.slice(0, partIndex).reduce((sum, range) => sum + range[2] - range[1] + 1, 0);
 }
 
-Page({
+Page(Object.assign({
   data: {
     title: '',
     file: '',
@@ -167,4 +169,4 @@ Page({
     this.imageErrorShown = true;
     wx.showToast({ title: '当前页加载失败', icon: 'none' });
   }
-});
+}, withShare()));
