@@ -123,8 +123,8 @@ def check_versions_and_config() -> None:
     )
     if site.get('sourceVersion') != 'v1.29':
         fail('sourceVersion 应为 v1.29')
-    if site.get('version') != 'v1.2.6-mini':
-        fail('小程序版本应为 v1.2.6-mini')
+    if site.get('version') != 'v1.2.7-mini':
+        fail('小程序版本应为 v1.2.7-mini')
 
     config = json.loads(ROOT.joinpath('project.config.json').read_text(encoding='utf-8'))
     ignored = {(item.get('type'), item.get('value')) for item in config.get('packOptions', {}).get('ignore', [])}

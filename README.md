@@ -2,9 +2,9 @@
 
 沈阳化工大学校园指南（非官方学生共建）的微信小程序端。
 
-- 小程序版本：`v1.2.6-mini`
+- 小程序版本：`v1.2.7-mini`
 - 同步的网页版版本：`v1.29`
-- 内容同步日期：`2026-08-10`
+- 内容同步日期：`2026-08-13`
 - 资料数量：41 份
 - 本地图片预览：13 份 PDF，共 142 页
 
@@ -12,6 +12,13 @@
 网页版地址：<https://www.syuct.top/>
 
 
+
+## v1.2.7 全页面分享
+
+- 新增 `utils/share.js` 统一分享模块，通过 `withShare()` 注入 `onShareAppMessage`（转发给好友）与 `onShareTimeline`（分享朋友圈）。
+- 22 个页面（主包 12 + 分包 9 + 预览模板 1）全部支持转发，分享卡片自动携带当前页面路径，好友点开直达对应页。
+- 新增 `scripts/inject-share.py`：为后续新增页面一键注入分享能力（自动计算相对路径层级）。
+- 新增 `scripts/verify-require.py`：校验所有已注册页面的相对 `require` 路径可解析，防止路径层级错误导致编译白屏。
 
 ## v1.2.5 包体优化与 v1.29 同步
 
@@ -71,7 +78,8 @@ syuct-miniprogram/
 │   └── previews.js          # PDF 图片预览 manifest
 ├── utils/
 │   ├── doc.js               # 文档预览与浏览器链接复制逻辑
-│   └── page.js              # 首页常问入口的页面锚点跳转
+│   ├── page.js              # 首页常问入口的页面锚点跳转
+│   └── share.js             # ⭐ 统一分享模块（转发 / 朋友圈）
 ├── pages/
 │   ├── index/               # 首页
 │   ├── freshman/            # 新生入学
@@ -93,7 +101,9 @@ syuct-miniprogram/
 └── scripts/
     ├── copy-preview-pages.py
     ├── gen-manifest.py
+    ├── inject-share.py       # 为页面批量注入分享能力
     ├── verify-previews.py
+    ├── verify-require.py     # 校验 require 路径可解析
     └── verify-sync.py
 ```
 
@@ -145,11 +155,13 @@ python3 scripts/verify-previews.py
 ```bash
 python3 scripts/verify-sync.py
 python3 scripts/verify-previews.py
+python3 scripts/verify-require.py
 ```
 
 校验内容包括：
 
 - 所有 JavaScript 语法；
+- 所有已注册页面的相对 `require` 路径可解析（防止分享注入等批量修改引入路径层级错误）；
 - 41 份文档 ID、路径和分类唯一性；
 - 页面中不存在重复硬编码的 `docs/...` 文档清单；
 - 142 张预览图片完整；

@@ -22,10 +22,10 @@ const COMMUNITY_GROUPS = [
 ];
 
 const SITE = {
-  version: 'v1.2.6-mini',
+  version: 'v1.2.7-mini',
   sourceVersion: 'v1.29',
-  sourceRevision: '20260810',
-  updatedAt: '2026-08-10',
+  sourceRevision: '20260813',
+  updatedAt: '2026-08-13',
   updatedMonth: '2026-08',
   siteUrl: 'https://www.syuct.top/',
   officialUrl: 'https://www.syuct.edu.cn/',
