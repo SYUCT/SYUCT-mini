@@ -15,6 +15,10 @@ jobs:
       - name: 校验 JS 语法
         run: node --check miniprogram/app.js
 
+      - name: 安装校验依赖
+        run: |
+          python3 -m pip install --quiet brotli
+
       - name: 运行同步与包体校验
         run: |
           python3 scripts/verify-sync.py
