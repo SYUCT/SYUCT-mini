@@ -76,6 +76,10 @@
   padding-top: 16rpx;
 }
 
+.about-sub2 {
+  margin-top: 2rpx;
+}
+
 .source-item {
   margin-top: 0;
   color: var(--text);

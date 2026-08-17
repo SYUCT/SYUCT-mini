@@ -10,6 +10,7 @@
   <view class="page-head about-page-head">
     <view class="page-title">{{about.title}}</view>
     <view class="page-sub">{{about.subtitle}}</view>
+    <view class="page-sub about-sub2">{{about.subtitle2}}</view>
   </view>
 
   <view class="card">
