@@ -1,0 +1,93 @@
+.landmark-hero {
+  display: flex;
+  align-items: center;
+  gap: 18rpx;
+  margin: 24rpx 24rpx 8rpx;
+  padding: 30rpx 28rpx 24rpx;
+  overflow: hidden;
+  border: 1rpx solid #e3e8ef;
+  border-radius: 24rpx;
+  background: linear-gradient(135deg, #ffffff 0%, #f2f7fc 100%);
+  box-shadow: 0 4rpx 18rpx rgba(7, 92, 168, 0.07);
+}
+
+.landmark-copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.landmark-title {
+  color: #1f2328;
+  font-size: 38rpx;
+  font-weight: 800;
+  line-height: 1.32;
+}
+
+.landmark-subtitle {
+  margin-top: 12rpx;
+  color: #6e7781;
+  font-size: 25rpx;
+  line-height: 1.7;
+}
+
+.sync-badge {
+  display: inline-flex;
+  margin-top: 16rpx;
+  padding: 6rpx 16rpx;
+  border-radius: 999rpx;
+  background: rgba(7, 92, 168, 0.08);
+  color: #075ca8;
+  font-size: 21rpx;
+  font-weight: 600;
+}
+
+.landmark-visual {
+  width: 246rpx;
+  flex: 0 0 246rpx;
+  padding: 8rpx 0 0;
+  text-align: center;
+  transition: opacity 0.15s ease;
+}
+
+.landmark-visual-active {
+  opacity: 0.72;
+}
+
+.landmark-image {
+  display: block;
+  width: 246rpx;
+  height: 180rpx;
+}
+
+.landmark-label {
+  display: inline-block;
+  max-width: 230rpx;
+  margin-top: 2rpx;
+  padding: 6rpx 12rpx;
+  overflow: hidden;
+  border-radius: 999rpx;
+  background: rgba(7, 92, 168, 0.09);
+  color: #075ca8;
+  font-size: 20rpx;
+  font-weight: 600;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 360px) {
+  .landmark-hero {
+    align-items: flex-start;
+    padding-right: 18rpx;
+  }
+
+  .landmark-visual {
+    width: 210rpx;
+    flex-basis: 210rpx;
+  }
+
+  .landmark-image {
+    width: 210rpx;
+    height: 160rpx;
+  }
+}

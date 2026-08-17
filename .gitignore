@@ -1,0 +1,7 @@
+project.private.config.json
+.DS_Store
+__MACOSX/
+node_modules/
+*.zip
+dist/
+.miniprogram-backup/

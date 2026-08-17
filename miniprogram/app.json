@@ -1,0 +1,151 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/freshman/freshman",
+    "pages/map/map",
+    "pages/map-detail/map-detail",
+    "pages/digital/digital",
+    "pages/academics/academics",
+    "pages/services/services",
+    "pages/campus/campus",
+    "pages/campus-detail/campus-detail",
+    "pages/resources/resources",
+    "pages/about/about"
+  ],
+  "subPackages": [
+    {
+      "root": "packages/maps-main",
+      "name": "mapsMain",
+      "pages": [
+        "pages/viewer/viewer"
+      ]
+    },
+    {
+      "root": "packages/maps-delivery",
+      "name": "mapsDelivery",
+      "pages": [
+        "pages/viewer/viewer"
+      ]
+    },
+    {
+      "root": "packages/gallery",
+      "name": "gallery",
+      "pages": [
+        "pages/viewer/viewer"
+      ]
+    },
+    {
+      "root": "packages/pdf-a",
+      "name": "pdfA",
+      "pages": [
+        "pages/open/open"
+      ]
+    },
+    {
+      "root": "packages/pdf-b",
+      "name": "pdfB",
+      "pages": [
+        "pages/open/open"
+      ]
+    },
+    {
+      "root": "packages/pdf-c",
+      "name": "pdfC",
+      "pages": [
+        "pages/open/open"
+      ]
+    },
+    {
+      "root": "packages/pdf-d",
+      "name": "pdfD",
+      "pages": [
+        "pages/open/open"
+      ]
+    },
+    {
+      "root": "packages/pdf-e",
+      "name": "pdfE",
+      "pages": [
+        "pages/open/open"
+      ]
+    },
+    {
+      "root": "packages/pdf-f",
+      "name": "pdfF",
+      "pages": [
+        "pages/open/open"
+      ]
+    },
+    {
+      "root": "packages/pdf-g",
+      "name": "pdfG",
+      "pages": [
+        "pages/open/open"
+      ]
+    },
+    {
+      "root": "packages/pdf-h",
+      "name": "pdfH",
+      "pages": [
+        "pages/open/open"
+      ]
+    },
+    {
+      "root": "packages/pdf-i",
+      "name": "pdfI",
+      "pages": [
+        "pages/open/open"
+      ]
+    }
+  ],
+  "window": {
+    "navigationBarTitleText": "沈化校园指南",
+    "navigationBarBackgroundColor": "#075ca8",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#f4f6f9"
+  },
+  "tabBar": {
+    "color": "#8b949e",
+    "selectedColor": "#075ca8",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页",
+        "iconPath": "assets/tab/tab-home.png",
+        "selectedIconPath": "assets/tab/tab-home-active.png"
+      },
+      {
+        "pagePath": "pages/map/map",
+        "text": "地图",
+        "iconPath": "assets/tab/tab-map.png",
+        "selectedIconPath": "assets/tab/tab-map-active.png"
+      },
+      {
+        "pagePath": "pages/resources/resources",
+        "text": "资料",
+        "iconPath": "assets/tab/tab-docs.png",
+        "selectedIconPath": "assets/tab/tab-docs-active.png"
+      },
+      {
+        "pagePath": "pages/campus/campus",
+        "text": "生活",
+        "iconPath": "assets/tab/tab-life.png",
+        "selectedIconPath": "assets/tab/tab-life-active.png"
+      },
+      {
+        "pagePath": "pages/about/about",
+        "text": "关于",
+        "iconPath": "assets/tab/tab-about.png",
+        "selectedIconPath": "assets/tab/tab-about-active.png"
+      }
+    ]
+  },
+  "sitemapLocation": "sitemap.json",
+  "style": "v2",
+  "lazyCodeLoading": "requiredComponents",
+  "usingComponents": {
+    "landmark-hero": "/components/landmark-hero/landmark-hero"
+  }
+}

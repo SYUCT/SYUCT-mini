@@ -1,0 +1,85 @@
+<view class="page">
+  <view class="card about-hero">
+    <view class="about-logo">🏭</view>
+    <view class="about-name">沈阳化工大学校园指南</view>
+    <view class="about-en">SYUCT Campus Guide</view>
+    <view class="about-badge">非官方 · 学生共建</view>
+    <view class="about-version">小程序版 {{site.version}} · 网页版基线 {{site.sourceVersion}}</view>
+  </view>
+
+  <view class="page-head about-page-head">
+    <view class="page-title">{{about.title}}</view>
+    <view class="page-sub">{{about.subtitle}}</view>
+  </view>
+
+  <view class="card">
+    <view class="card-title">📖 为什么做这个站</view>
+    <view class="about-text">{{about.purpose}}</view>
+  </view>
+
+  <view class="card">
+    <view class="card-title">💬 加入交流群</view>
+    <view class="list-row" wx:for="{{communityGroups}}" wx:key="id">
+      <view class="list-icon">{{item.icon}}</view>
+      <view class="list-main">
+        <view class="list-title">{{item.title}}</view>
+        <view class="list-desc">QQ群 {{item.number}}</view>
+      </view>
+      <view class="group-actions">
+        <view class="group-btn group-btn-copy" bindtap="copyCommunityGroup" data-number="{{item.number}}" data-label="{{item.copyLabel}}">复制群号</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="card-title">🧾 资料来源与边界</view>
+    <view class="check-item" wx:for="{{about.sources}}" wx:key="*this">
+      <view class="check-mark">✓</view>
+      <view class="check-copy"><view class="check-desc source-item">{{item}}</view></view>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="card-title">🤝 如何共建</view>
+    <view class="step-list">
+      <view class="step-item" wx:for="{{about.contribution}}" wx:key="step">
+        <view class="step-num">{{item.step}}</view>
+        <view class="step-body">
+          <view class="step-title">{{item.title}}</view>
+          <view class="step-desc">{{item.desc}}</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="ack-entry" bindtap="openAcknowledgements">
+      <view class="ack-icon">🏅</view>
+      <view class="ack-main">
+        <view class="ack-title">{{about.acknowledgements.title}}</view>
+        <view class="ack-desc">{{about.acknowledgements.desc}}</view>
+        <view class="ack-note">{{about.acknowledgements.note}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="card-title">🔗 相关入口</view>
+    <view class="list-row" bindtap="openSite">
+      <view class="list-icon">🌐</view>
+      <view class="list-main"><view class="list-title">校园指南网页版</view><view class="list-desc">日常分享优先使用 www.syuct.top</view></view>
+      <view class="list-arrow">↗</view>
+    </view>
+    <view class="list-row" bindtap="openOfficial">
+      <view class="list-icon">🏛️</view>
+      <view class="list-main"><view class="list-title">沈阳化工大学官网</view><view class="list-desc">政策和正式通知以学校官网为准</view></view>
+      <view class="list-arrow">↗</view>
+    </view>
+    <view class="list-row" bindtap="openRepo">
+      <view class="list-icon">🐙</view>
+      <view class="list-main"><view class="list-title">GitHub 仓库</view><view class="list-desc">查看源码、更新记录或提交修改</view></view>
+      <view class="list-arrow">↗</view>
+    </view>
+  </view>
+
+  <view class="callout warning">本站为非官方学生共建项目。涉及政策、收费、考试、学籍、培养方案和毕业要求的内容，请始终以学校及学院当年正式通知为准。</view>
+  <view class="page-footer">内容基线 {{site.sourceVersion}} · {{site.updatedAt}}</view>
+</view>

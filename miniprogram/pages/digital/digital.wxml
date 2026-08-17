@@ -1,0 +1,44 @@
+<view class="page">
+  <landmark-hero
+    title="{{digital.title}}"
+    subtitle="{{digital.subtitle}}"
+    source-version="{{site.sourceVersion}}"
+    landmark="{{digital.landmark}}"
+    bindlandmarktap="openLandmark"
+  />
+
+  <view class="callout warning">账号安全：{{digital.warning}}</view>
+
+  <view class="section-block" wx:for="{{sections}}" wx:key="id" wx:for-item="section" id="{{section.id}}">
+    <view class="section-block-title"><text class="section-block-icon">{{section.icon}}</text><text>{{section.name}}</text></view>
+    <view class="section-block-lead">{{section.lead}}</view>
+
+    <view class="section-card step-list" wx:if="{{section.id == 'identity'}}">
+      <view class="step-item" wx:for="{{digital.identitySteps}}" wx:key="step">
+        <view class="step-num">{{item.step}}</view>
+        <view class="step-body">
+          <view class="step-title">{{item.title}}</view>
+          <view class="step-desc">{{item.desc}}</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="section-card doc-list-card">
+      <view class="list-row" wx:for="{{section.items}}" wx:key="id" wx:for-item="doc" bindtap="openDoc" data-file="{{doc.file}}" data-title="{{doc.title}}">
+        <view class="list-icon">📄</view>
+        <view class="list-main">
+          <view class="list-title">{{doc.title}}</view>
+          <view class="doc-description">{{doc.description}}</view>
+          <view class="doc-meta">{{doc.note}}</view>
+        </view>
+        <view class="list-arrow">›</view>
+      </view>
+    </view>
+
+    <view class="action-row" wx:if="{{section.action}}">
+      <view class="btn-primary" bindtap="openAction" data-url="{{section.action.url}}" data-title="{{section.action.title}}">{{section.action.title}}</view>
+    </view>
+  </view>
+
+  <view class="page-footer">账号与系统可用性以学校官方页面为准</view>
+</view>

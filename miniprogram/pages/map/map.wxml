@@ -1,0 +1,106 @@
+<view class="page">
+  <landmark-hero
+    title="{{pageInfo.title}}"
+    subtitle="{{pageInfo.subtitle}}"
+    source-version="{{site.sourceVersion}}"
+    landmark="{{pageInfo.landmark}}"
+    bindlandmarktap="openLandmark"
+  />
+
+  <view class="callout">使用建议：{{pageInfo.advice}}</view>
+
+  <block wx:for="{{maps}}" wx:key="id" wx:for-item="mapItem">
+    <view class="section-block" id="{{mapItem.id}}">
+      <view class="section-block-title"><text>{{mapItem.id == 'campus-map' ? '🏫' : '🏃'}}</text><text>{{mapItem.name}}</text></view>
+      <view class="map-card" bindtap="openMapViewer" data-id="{{mapItem.id}}">
+        <image class="map-image" src="{{mapItem.file}}" mode="aspectFit" lazy-load="{{true}}" />
+        <view class="map-overlay">
+          <view class="map-name">{{mapItem.name}}</view>
+          <view class="map-desc">{{mapItem.desc}}</view>
+          <view class="map-meta">高清 {{mapItem.resolution}} · 支持双指缩放</view>
+          <view class="map-tap">点击进入高清查看器 →</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="card" wx:if="{{mapItem.id == 'campus-map'}}">
+      <view class="card-title">📍 常用地点速查</view>
+      <view class="place-list">
+        <view class="list-row" wx:for="{{places}}" wx:key="name" wx:for-item="place">
+          <view class="list-main"><view class="list-title">{{place.name}}</view></view>
+          <view class="list-num">编号 {{place.num}}</view>
+        </view>
+      </view>
+      <view class="card-hint">编号对应校园总图上的标注，可在上方大图中查找。</view>
+    </view>
+
+    <view class="section-block" wx:if="{{mapItem.id == 'campus-map'}}" id="delivery">
+      <view class="section-block-title"><text>📦</text><text>快递取件导航</text></view>
+      <view class="callout">
+        <view><strong>快递地址：</strong>{{pageInfo.deliveryAddress}}</view>
+        <view><strong>驿站取件时间：</strong>{{pageInfo.deliveryHours}}</view>
+      </view>
+      <view class="delivery-grid">
+        <view class="delivery-item" wx:for="{{pageInfo.deliveryPoints}}" wx:key="name">
+          <view class="delivery-name">{{item.name}}</view>
+          <view class="delivery-desc">{{item.desc}}</view>
+        </view>
+      </view>
+      <view class="map-card" bindtap="openMapViewer" data-id="delivery-pickup-overview">
+        <image class="map-image" src="/assets/delivery-pickup-overview.jpg" mode="aspectFit" lazy-load="{{true}}" />
+        <view class="map-overlay">
+          <view class="map-name">取件位置总览</view>
+          <view class="map-desc">主校区、大学生活城、菜鸟驿站、化大好吃街及地下通道的相对位置</view>
+          <view class="map-tap">点击查看大图 →</view>
+        </view>
+      </view>
+      <view class="map-card" bindtap="openMapViewer" data-id="delivery-haochijie-layout">
+        <image class="map-image" src="/assets/delivery-haochijie-layout.jpg" mode="aspectFit" lazy-load="{{true}}" />
+        <view class="map-overlay">
+          <view class="map-name">化大好吃街内部点位</view>
+          <view class="map-desc">中通、圆通、申通、韵达、极兔集中在刘全生鲜超市一楼区域</view>
+          <view class="map-tap">点击查看大图 →</view>
+        </view>
+      </view>
+      <view class="check-list">
+        <view class="check-item"><view class="check-mark">1</view><view class="check-copy"><view class="check-title">生活城菜鸟驿站</view><view class="check-desc">位于三食堂隔壁，可取顺丰、京东、邮政。</view></view></view>
+        <view class="check-item"><view class="check-mark">2</view><view class="check-copy"><view class="check-title">化大好吃街</view><view class="check-desc">刘全生鲜超市一楼进门左转，可取中通、圆通、申通、韵达、极兔。</view></view></view>
+        <view class="check-item"><view class="check-mark">3</view><view class="check-copy"><view class="check-title">取件时限</view><view class="check-desc">{{pageInfo.deliveryDeadline}}</view></view></view>
+      </view>
+      <view class="delivery-note">{{pageInfo.deliveryNote}}</view>
+    </view>
+
+    <view class="section-block sports-check" wx:if="{{mapItem.id == 'sports-map'}}">
+      <view class="section-block-title"><text>✅</text><text>上体育课前确认三件事</text></view>
+      <view class="check-list">
+        <view class="check-item" wx:for="{{pageInfo.sportsChecklist}}" wx:key="title">
+          <view class="check-mark">{{index + 1}}</view>
+          <view class="check-copy">
+            <view class="check-title">{{item.title}}</view>
+            <view class="check-desc">{{item.desc}}</view>
+          </view>
+        </view>
+      </view>
+      <view class="score-note">
+        <view class="score-note-title">📊 体育课成绩构成</view>
+        <view class="score-note-text">{{pageInfo.sportsScoreNote}}</view>
+      </view>
+    </view>
+  </block>
+
+  <view class="section-block" id="panorama">
+    <view class="section-block-title"><text>🌐</text><text>官方校园全景</text></view>
+    <view class="panorama-card">
+      <image class="panorama-cover" src="/assets/campus-panorama-cover.jpg" mode="aspectFill" lazy-load="{{true}}" />
+      <view class="panorama-body">
+        <view class="panorama-type">720° VR</view>
+        <view class="panorama-title">{{pageInfo.panoramaTitle}}</view>
+        <view class="panorama-desc">{{pageInfo.panoramaDesc}}</view>
+        <view class="btn-primary panorama-btn" bindtap="openPanorama">开始浏览校园全景</view>
+        <view class="panorama-note">{{pageInfo.panoramaNote}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="page-footer">地图与官方全景入口同步自网页版 {{site.sourceVersion}}</view>
+</view>

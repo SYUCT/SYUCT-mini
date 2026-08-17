@@ -1,0 +1,17 @@
+<view class="landmark-hero">
+  <view class="landmark-copy">
+    <view class="landmark-title">{{title}}</view>
+    <view class="landmark-subtitle">{{subtitle}}</view>
+    <view class="sync-badge" wx:if="{{sourceVersion}}">同步网页版 {{sourceVersion}}</view>
+  </view>
+  <view
+    class="landmark-visual"
+    bindtap="handleTap"
+    hover-class="landmark-visual-active"
+    role="button"
+    aria-label="查看校园相册"
+  >
+    <image class="landmark-image" src="{{landmark.image}}" mode="aspectFit" />
+    <view class="landmark-label">校园地标 · {{landmark.name}}</view>
+  </view>
+</view>

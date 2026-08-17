@@ -1,0 +1,92 @@
+<view class="page">
+  <landmark-hero
+    title="{{fresh.title}}"
+    subtitle="{{fresh.subtitle}}"
+    source-version="{{site.sourceVersion}}"
+    landmark="{{fresh.landmark}}"
+    bindlandmarktap="openLandmark"
+  />
+
+  <view class="callout">适用范围：{{fresh.scope}}</view>
+  <view class="callout warning">先看官方通知：{{fresh.warning}}</view>
+
+  <view class="section-block" id="timeline">
+    <view class="section-block-title"><text>📅</text><text>关键时间</text></view>
+    <view class="section-card timeline">
+      <view class="timeline-item {{item.highlight ? 'timeline-highlight' : ''}}" wx:for="{{fresh.timeline}}" wx:key="date">
+        <view class="timeline-dot"></view>
+        <view class="timeline-date">{{item.date}}</view>
+        <view class="timeline-event">{{item.event}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="section-block" id="guide">
+    <view class="section-block-title"><text>📋</text><text>报到前先准备什么</text></view>
+    <view class="check-list">
+      <view class="check-item {{item.link ? 'check-item-link' : ''}}" wx:for="{{fresh.preparation}}" wx:key="title" bindtap="openPrepLink" data-link="{{item.link}}">
+        <view class="check-mark">✓</view>
+        <view class="check-copy">
+          <view class="check-title">{{item.title}}</view>
+          <view class="check-desc">{{item.desc}}</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="section-card guide-docs">
+      <view class="list-row" wx:for="{{guide.items}}" wx:key="id" bindtap="openDoc" data-file="{{item.file}}" data-title="{{item.title}}">
+        <view class="list-icon">📄</view>
+        <view class="list-main">
+          <view class="list-title">{{item.title}}</view>
+          <view class="doc-description">{{item.description}}</view>
+          <view class="doc-meta">{{item.note}}</view>
+        </view>
+        <view class="list-arrow">›</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="section-block" id="payment">
+    <view class="section-block-title"><text>💳</text><text>缴费、银行卡与助学贷款</text></view>
+    <view class="section-block-lead">{{fresh.paymentText}}</view>
+    <view class="section-card loan-doc-card">
+      <view class="list-row" bindtap="openDoc" data-file="{{loanDoc.file}}" data-title="{{loanDoc.title}}">
+        <view class="list-icon">📄</view>
+        <view class="list-main">
+          <view class="list-title loan-doc-title">生源地助学贷款资料</view>
+          <view class="doc-meta">{{loanDoc.note}}</view>
+        </view>
+      </view>
+    </view>
+    <view class="callout warning payment-warning">安全提醒：{{fresh.paymentWarning}}</view>
+  </view>
+
+  <view class="section-block" id="first-week">
+    <view class="section-block-title"><text>🗓️</text><text>到校后的第一周</text></view>
+    <view class="section-card step-list">
+      <view class="step-item" wx:for="{{fresh.firstWeek}}" wx:key="step">
+        <view class="step-num">{{item.step}}</view>
+        <view class="step-body">
+          <view class="step-title">{{item.title}}</view>
+          <view class="step-desc">{{item.desc}}</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="card-title">💬 加入交流群</view>
+    <view class="list-row" wx:for="{{communityGroups}}" wx:key="id">
+      <view class="list-icon">{{item.icon}}</view>
+      <view class="list-main">
+        <view class="list-title">{{item.title}}</view>
+        <view class="list-desc">QQ群 {{item.number}}</view>
+      </view>
+      <view class="group-actions">
+        <view class="group-btn group-btn-copy" bindtap="copyCommunityGroup" data-number="{{item.number}}" data-label="{{item.copyLabel}}">复制群号</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="page-footer">资料整理至 {{site.updatedAt}} · 以学校最新通知为准</view>
+</view>

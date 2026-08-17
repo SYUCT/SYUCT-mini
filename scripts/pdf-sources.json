@@ -1,0 +1,322 @@
+{
+  "thresholdBytes": 3145728,
+  "packages": {
+    "packages/pdf-a": [
+      "calculus-2-final-2025-2026.pdf"
+    ],
+    "packages/pdf-b": [
+      "graduation-self-check.docx",
+      "summer-campus-stay-2026.pdf",
+      "electives-2026-2027.xlsx",
+      "student-record-change-application-2020.docx"
+    ],
+    "packages/pdf-c": [
+      "chaoxing-library-guide.docx",
+      "student-origin-credit-loan-liaoning-2026.pdf",
+      "wifi7-transition-notice.docx"
+    ],
+    "packages/pdf-d": [
+      "computer-science-plan-2025.pdf",
+      "unified-identity-guide.pdf",
+      "calendar-2026-2027.pdf",
+      "open-lab-application.doc"
+    ],
+    "packages/pdf-e": [
+      "off-campus-e-resources.docx",
+      "elective-recommendations-2026.pdf",
+      "graduate-registration-form.pdf",
+      "thesis-plagiarism-check-2026.docx",
+      "info-engineering-electives-2025.docx",
+      "classroom-video-review-application.docx",
+      "pe-health-course-application.docx",
+      "deferred-exam-application.doc"
+    ],
+    "packages/pdf-f": [
+      "webvpn-guide.pdf",
+      "chemical-engineering-plan-2025.pdf",
+      "campus-run-exemption.doc",
+      "exam-review-form.doc"
+    ],
+    "packages/pdf-g": [
+      "engineering-management-plan-2025.docx",
+      "carsi-guide.pdf",
+      "pe-electives-experience.pdf"
+    ],
+    "packages/pdf-h": [
+      "scholarship-application-guide.docx",
+      "syuct-acknowledgements.pdf",
+      "code-tables.xls",
+      "thesis-template-2023.doc",
+      "student-regulations.pdf",
+      "hometown-groups.xlsx",
+      "certificate-proxy.doc",
+      "special-course-selection-form.doc",
+      "party-activist-form.xls"
+    ],
+    "packages/pdf-i": [
+      "competition-management-supplement-2025.pdf",
+      "competition-management-reward-2024.pdf",
+      "physical-fitness-score-tables.pdf"
+    ]
+  },
+  "documents": [
+    {
+      "file": "student-origin-credit-loan-liaoning-2026.pdf",
+      "sourceBytes": 2699763,
+      "internal": true,
+      "quality": "same-resolution JPEG q95"
+    },
+    {
+      "file": "unified-identity-guide.pdf",
+      "sourceBytes": 639711,
+      "internal": true,
+      "quality": "lossless"
+    },
+    {
+      "file": "hometown-groups.xlsx",
+      "sourceBytes": 12634,
+      "internal": true,
+      "quality": "lossless"
+    },
+    {
+      "file": "electives-2026-2027.xlsx",
+      "sourceBytes": 103304,
+      "internal": true,
+      "quality": "lossless"
+    },
+    {
+      "file": "computer-science-plan-2025.pdf",
+      "sourceBytes": 943169,
+      "internal": true,
+      "quality": "lossless"
+    },
+    {
+      "file": "chemical-engineering-plan-2025.pdf",
+      "sourceBytes": 762870,
+      "internal": true,
+      "quality": "lossless"
+    },
+    {
+      "file": "info-engineering-electives-2025.docx",
+      "sourceBytes": 18308,
+      "internal": true,
+      "quality": "lossless"
+    },
+    {
+      "file": "certificate-proxy.doc",
+      "sourceBytes": 15360,
+      "internal": true,
+      "quality": "lossless"
+    },
+    {
+      "file": "exam-review-form.doc",
+      "sourceBytes": 30208,
+      "internal": true,
+      "quality": "lossless"
+    },
+    {
+      "file": "graduate-registration-form.pdf",
+      "sourceBytes": 96076,
+      "internal": true,
+      "quality": "lossless"
+    },
+    {
+      "file": "party-activist-form.xls",
+      "sourceBytes": 15360,
+      "internal": true,
+      "quality": "lossless"
+    },
+    {
+      "file": "code-tables.xls",
+      "sourceBytes": 1536000,
+      "internal": true,
+      "quality": "lossless"
+    },
+    {
+      "file": "campus-run-exemption.doc",
+      "sourceBytes": 19456,
+      "internal": true,
+      "quality": "lossless"
+    },
+    {
+      "file": "special-course-selection-form.doc",
+      "sourceBytes": 22016,
+      "internal": true,
+      "quality": "lossless"
+    },
+    {
+      "file": "thesis-template-2023.doc",
+      "sourceBytes": 442153,
+      "internal": true,
+      "quality": "lossless"
+    },
+    {
+      "file": "calculus-2-final-2025-2026.pdf",
+      "sourceBytes": 1561834,
+      "internal": true,
+      "quality": "lossless"
+    },
+    {
+      "file": "student-regulations.pdf",
+      "sourceBytes": 233448,
+      "internal": true,
+      "quality": "lossless"
+    },
+    {
+      "file": "calendar-2026-2027.pdf",
+      "sourceBytes": 48554,
+      "internal": true,
+      "quality": "lossless"
+    },
+    {
+      "file": "wifi7-transition-notice.docx",
+      "sourceBytes": 11190,
+      "internal": true,
+      "quality": "lossless"
+    },
+    {
+      "file": "graduation-self-check.docx",
+      "sourceBytes": 1361674,
+      "internal": true,
+      "quality": "lossless"
+    },
+    {
+      "file": "off-campus-e-resources.docx",
+      "sourceBytes": 799239,
+      "internal": true,
+      "quality": "lossless"
+    },
+    {
+      "file": "chaoxing-library-guide.docx",
+      "sourceBytes": 925317,
+      "internal": true,
+      "quality": "lossless"
+    },
+    {
+      "file": "thesis-plagiarism-check-2026.docx",
+      "sourceBytes": 18445,
+      "internal": true,
+      "quality": "lossless"
+    },
+    {
+      "file": "physical-fitness-score-tables.pdf",
+      "sourceBytes": 179909,
+      "internal": true,
+      "quality": "lossless"
+    },
+    {
+      "file": "pe-electives-experience.pdf",
+      "sourceBytes": 479982,
+      "internal": true,
+      "quality": "lossless"
+    },
+    {
+      "file": "webvpn-guide.pdf",
+      "sourceBytes": 787866,
+      "internal": true,
+      "quality": "lossless"
+    },
+    {
+      "file": "carsi-guide.pdf",
+      "sourceBytes": 510004,
+      "internal": true,
+      "quality": "lossless"
+    },
+    {
+      "file": "scholarship-application-guide.docx",
+      "sourceBytes": 330093,
+      "internal": true,
+      "quality": "lossless"
+    },
+    {
+      "file": "engineering-management-plan-2025.docx",
+      "sourceBytes": 520393,
+      "internal": true,
+      "quality": "lossless"
+    },
+    {
+      "file": "elective-recommendations-2026.pdf",
+      "sourceBytes": 1279650,
+      "internal": true,
+      "quality": "lossless"
+    },
+    {
+      "file": "competition-management-supplement-2025.pdf",
+      "sourceBytes": 222970,
+      "internal": true,
+      "quality": "lossless"
+    },
+    {
+      "file": "competition-management-reward-2024.pdf",
+      "sourceBytes": 198999,
+      "internal": true,
+      "quality": "lossless"
+    },
+    {
+      "file": "open-lab-application.doc",
+      "sourceBytes": 33792,
+      "internal": true,
+      "quality": "lossless"
+    },
+    {
+      "file": "student-record-change-application-2020.docx",
+      "sourceBytes": 15132,
+      "internal": true,
+      "quality": "lossless"
+    },
+    {
+      "file": "deferred-exam-application.doc",
+      "sourceBytes": 34816,
+      "internal": true,
+      "quality": "lossless"
+    },
+    {
+      "file": "classroom-video-review-application.docx",
+      "sourceBytes": 15947,
+      "internal": true,
+      "quality": "lossless"
+    },
+    {
+      "file": "pe-health-course-application.docx",
+      "sourceBytes": 13314,
+      "internal": true,
+      "quality": "lossless"
+    },
+    {
+      "file": "summer-campus-stay-2026.pdf",
+      "sourceBytes": 110921,
+      "internal": true,
+      "quality": "lossless"
+    },
+    {
+      "file": "syuct-acknowledgements.pdf",
+      "sourceBytes": 347808,
+      "internal": true,
+      "quality": "lossless"
+    },
+    {
+      "file": "2026-new-student-guide.pdf",
+      "sourceBytes": 12660010,
+      "internal": false,
+      "quality": "external-link"
+    },
+    {
+      "file": "physics-1-final-2025-2026.pdf",
+      "sourceBytes": 3964828,
+      "internal": false,
+      "quality": "220dpi scan optimization"
+    },
+    {
+      "file": "repeat-course-payment.pdf",
+      "sourceBytes": 3287095,
+      "internal": false,
+      "quality": "lossless"
+    },
+    {
+      "file": "micro-majors-2026.pdf",
+      "sourceBytes": 11049757,
+      "internal": false,
+      "quality": "external-link"
+    }
+  ]
+}

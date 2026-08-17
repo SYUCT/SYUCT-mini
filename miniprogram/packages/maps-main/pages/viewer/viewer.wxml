@@ -1,0 +1,47 @@
+<view class="viewer-page">
+  <view class="viewer-head">
+    <view class="viewer-title">{{map.title}}</view>
+    <view class="viewer-meta">原图 {{map.resolution}} · {{map.format}}</view>
+    <view class="viewer-tip">双指缩放，单指拖动查看文字和编号</view>
+  </view>
+
+  <movable-area class="map-area" scale-area="{{true}}">
+    <movable-view
+      class="map-movable"
+      direction="all"
+      inertia="{{true}}"
+      out-of-bounds="{{true}}"
+      scale="{{true}}"
+      scale-min="1"
+      scale-max="5"
+      scale-value="{{scale}}"
+      bindscale="onScale"
+    >
+      <image
+        class="map-full"
+        src="{{map.src}}"
+        mode="aspectFit"
+        bindload="onImageLoad"
+        binderror="onImageError"
+        show-menu-by-longpress="{{true}}"
+      />
+    </movable-view>
+
+    <view class="loading-layer" wx:if="{{loading}}">
+      <view class="loading-dot"></view>
+      <view>高清地图加载中…</view>
+    </view>
+
+    <view class="error-layer" wx:if="{{loadError}}">
+      <view class="error-title">地图加载失败</view>
+      <view class="error-desc">请返回后重新进入，或检查小程序文件是否完整。</view>
+    </view>
+  </movable-area>
+
+  <view class="viewer-toolbar">
+    <button class="tool-button" bindtap="zoomOut" aria-label="缩小地图">−</button>
+    <view class="scale-value">{{scaleLabel}}</view>
+    <button class="tool-button" bindtap="zoomIn" aria-label="放大地图">＋</button>
+    <button class="reset-button" bindtap="resetScale">适配屏幕</button>
+  </view>
+</view>
