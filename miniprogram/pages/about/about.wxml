@@ -13,7 +13,7 @@
   </view>
 
   <view class="card">
-    <view class="card-title">📖 为什么做这个站</view>
+    <view class="card-title">📖 为什么诞生了这个项目</view>
     <view class="about-text">{{about.purpose}}</view>
   </view>
 
@@ -85,6 +85,6 @@
     </view>
   </view>
 
-  <view class="callout warning">本站为非官方学生共建项目。涉及政策、收费、考试、学籍、培养方案和毕业要求的内容，请始终以学校及学院当年正式通知为准。</view>
+  <view class="callout warning">本小程序为非官方-学生共建项目。涉及政策、收费、考试、学籍、培养方案和毕业要求的内容，请始终以学校及学院当年正式通知为准。</view>
   <view class="page-footer">内容基线 {{site.sourceVersion}} · {{site.updatedAt}}</view>
 </view>
