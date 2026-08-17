@@ -30,5 +30,9 @@ Page(Object.assign({
 
   openRepo() {
     getApp().openWeb(this.data.site.repoUrl, '是否复制 GitHub 仓库链接到浏览器打开？');
+  },
+
+  openTeam() {
+    getApp().openWeb(this.data.site.teamUrl, '是否复制 SYUCT 学生团队官网链接到浏览器打开？');
   }
 }, withShare()));

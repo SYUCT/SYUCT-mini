@@ -75,7 +75,12 @@
     </view>
     <view class="list-row" bindtap="openRepo">
       <view class="list-icon">🐙</view>
-      <view class="list-main"><view class="list-title">GitHub 仓库</view><view class="list-desc">查看源码、更新记录或提交修改</view></view>
+      <view class="list-main"><view class="list-title">项目 GitHub 仓库</view><view class="list-desc">查看源码、更新记录或提交修改</view></view>
+      <view class="list-arrow">↗</view>
+    </view>
+    <view class="list-row" bindtap="openTeam">
+      <view class="list-icon">🧑‍🤝‍🧑</view>
+      <view class="list-main"><view class="list-title">SYUCT 学生团队官网</view><view class="list-desc">点击进入 GitHub 组织首页 - 非学校官方机构</view></view>
       <view class="list-arrow">↗</view>
     </view>
   </view>

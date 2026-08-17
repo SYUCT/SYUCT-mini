@@ -30,6 +30,7 @@ const SITE = {
   siteUrl: 'https://www.syuct.top/',
   officialUrl: 'https://www.syuct.edu.cn/',
   repoUrl: 'https://github.com/SYUCT/SYUCT-web',
+  teamUrl: 'https://github.com/SYUCT',
   panoramaUrl: 'https://www.720yun.com/t/f2vk69p9dqe?scene_id=100532629',
   qqGroup: COMMUNITY_GROUPS[0].number,
   tiebaGroup: COMMUNITY_GROUPS[1].number
