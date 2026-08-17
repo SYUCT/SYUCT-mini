@@ -8,6 +8,7 @@
 - 资料数量：42 份
 - 网页版仓库：`CiderHalo/SYUCT`
 - 网页版地址：`https://www.syuct.top/`
+- 小程序仓库：`SYUCT/SYUCT-mini`
 
 ## 项目结构
 
