@@ -1,6 +1,7 @@
+// Compatibility shim for v1.4.2/v1.4.3 cached page references.
+// Keep this file for one release cycle so older map.js does not white-screen.
 const { MAP, MAPS, PLACES, SITE } = require('../data/content');
 const { openUrl } = require('./doc');
-const { captureTarget, scrollToTarget } = require('./page');
 const { withShare } = require('./share');
 
 const VIEWER_ROUTES = {
@@ -19,42 +20,30 @@ const FALLBACK_IMAGES = {
 
 function createMapPage() {
   return Object.assign({
-    data: {
-      pageInfo: MAP,
-      maps: MAPS,
-      places: PLACES,
-      site: SITE
-    },
-
+    data: { pageInfo: MAP, maps: MAPS, places: PLACES, site: SITE },
     onLoad(options) {
-      captureTarget(this, options);
+      this.__scrollTarget = options && options.target ? String(options.target) : '';
     },
-
     onReady() {
-      scrollToTarget(this);
+      const target = this.__scrollTarget;
+      if (!target) return;
+      setTimeout(() => wx.pageScrollTo({ selector: `#${target}`, duration: 280 }), 80);
     },
-
     openLandmark() {
-      wx.navigateTo({
-        url: '/pages/campus-detail/campus-detail?target=photos'
-      });
+      wx.navigateTo({ url: '/pages/campus-detail/campus-detail?target=photos' });
     },
-
     openMapViewer(e) {
       const id = e && e.currentTarget && e.currentTarget.dataset && e.currentTarget.dataset.id;
       const route = VIEWER_ROUTES[id];
       if (!id || !route) return;
-
       wx.navigateTo({
         url: `${route}?id=${encodeURIComponent(id)}`,
         fail: () => {
           const current = FALLBACK_IMAGES[id];
-          if (!current) return;
-          wx.previewImage({ current, urls: [current] });
+          if (current) wx.previewImage({ current, urls: [current] });
         }
       });
     },
-
     openPanorama() {
       openUrl(this.data.site.panoramaUrl, '学校官方校园全景需要在浏览器中打开。是否复制链接？');
     }

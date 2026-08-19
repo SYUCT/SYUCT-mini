@@ -258,7 +258,8 @@
 
 .quick-arrow {
   color: var(--text-secondary);
-  font-size: 40rpx;
+  font-size: 24rpx;
+  font-weight: 600;
   margin-left: 12rpx;
 }
 
@@ -303,9 +304,17 @@
   padding: 0 40rpx;
 }
 
+.footer-link-row {
+  margin-top: 8rpx;
+}
+
 .footer-links {
   color: var(--primary);
-  margin-top: 8rpx;
+}
+
+.footer-sep {
+  color: #b7c0ca;
+  margin: 0 12rpx;
 }
 
 .footer-update {

@@ -13,7 +13,7 @@ Page(Object.assign({
     showGroupModal: false
   },
 
-  TAB_PAGES: ['/pages/index/index', '/pages/map/map', '/pages/resources/resources', '/pages/campus/campus', '/pages/about/about'],
+  TAB_PAGES: ['/pages/index/index', '/pages/map/map', '/pages/timetable/timetable', '/pages/resources/resources', '/pages/campus/campus'],
 
   onPortalTap(e) {
     this.gotoPage(e.currentTarget.dataset.page);
@@ -55,6 +55,10 @@ Page(Object.assign({
 
   openCampusGallery() {
     this.gotoPage('/pages/campus-detail/campus-detail?target=photos');
+  },
+
+  openAbout() {
+    wx.navigateTo({ url: '/pages/about/about' });
   },
 
   openSite() {

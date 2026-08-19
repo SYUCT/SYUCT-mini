@@ -18,7 +18,7 @@
           <view class="map-name">{{mapItem.name}}</view>
           <view class="map-desc">{{mapItem.desc}}</view>
           <view class="map-meta">高清 {{mapItem.resolution}} · 支持双指缩放</view>
-          <view class="map-tap">点击进入高清查看器 →</view>
+          <view class="map-tap">点击进入高清查看器</view>
         </view>
       </view>
     </view>
@@ -51,7 +51,7 @@
         <view class="map-overlay">
           <view class="map-name">取件位置总览</view>
           <view class="map-desc">主校区、大学生活城、菜鸟驿站、化大好吃街及地下通道的相对位置</view>
-          <view class="map-tap">点击查看大图 →</view>
+          <view class="map-tap">点击查看大图</view>
         </view>
       </view>
       <view class="map-card" bindtap="openMapViewer" data-id="delivery-haochijie-layout">
@@ -59,7 +59,7 @@
         <view class="map-overlay">
           <view class="map-name">化大好吃街内部点位</view>
           <view class="map-desc">中通、圆通、申通、韵达、极兔集中在刘全生鲜超市一楼区域</view>
-          <view class="map-tap">点击查看大图 →</view>
+          <view class="map-tap">点击查看大图</view>
         </view>
       </view>
       <view class="check-list">

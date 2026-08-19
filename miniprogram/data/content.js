@@ -1,5 +1,5 @@
 // data/content.js — 网页版同步的站点与非文档内容
-// 内容基线：SYUCT 网页版 v260809。
+// 内容基线：SYUCT 网页版 v1.29。
 // 文档标题、分类、文件路径及栏目分组统一维护在 data/documents.js。
 
 const COMMUNITY_GROUPS = [
@@ -22,15 +22,15 @@ const COMMUNITY_GROUPS = [
 ];
 
 const SITE = {
-  version: 'v1.3.2-mini',
-  sourceVersion: 'v260809',
+  version: 'v1.4.5-mini',
+  sourceVersion: 'v1.29',
   sourceRevision: '20260814',
   updatedAt: '2026-08-14',
   updatedMonth: '2026-08',
   siteUrl: 'https://www.syuct.top/',
   officialUrl: 'https://www.syuct.edu.cn/',
   repoUrl: 'https://github.com/SYUCT/SYUCT-web',
-  teamUrl: 'https://github.com/SYUCT',
+  orgUrl: 'https://github.com/SYUCT',
   panoramaUrl: 'https://www.720yun.com/t/f2vk69p9dqe?scene_id=100532629',
   qqGroup: COMMUNITY_GROUPS[0].number,
   tiebaGroup: COMMUNITY_GROUPS[1].number
@@ -58,12 +58,12 @@ const HOME = {
 };
 
 const PORTALS = [
-  { icon: '🎓', title: '新生入学', desc: '报到、缴费、账号激活、军训和新生材料。', action: '第一次来学校 →', page: '/pages/freshman/freshman' },
-  { icon: '🗺️', title: '校园地图', desc: '校园总图、快递取件、体育课地图与官方全景。', action: '找楼、取快递、找场馆 →', page: '/pages/map-detail/map-detail' },
-  { icon: '🔐', title: '数字校园', desc: '统一身份认证、WebVPN、CARSI 与图书馆服务。', action: '解决账号和网络 →', page: '/pages/digital/digital' },
-  { icon: '📚', title: '学业资料', desc: '培养方案、选修要求、微专业与课程真题。', action: '查课程、找资料 →', page: '/pages/academics/academics' },
-  { icon: '🏫', title: '办事大厅', desc: '重修、查卷、奖学金、毕业与论文手续。', action: '找表格、走流程 →', page: '/pages/services/services' },
-  { icon: '🌿', title: '校园生活', desc: '校历、体育、图书馆、学生规定和校园相册。', action: '日常学习生活 →', page: '/pages/campus-detail/campus-detail' }
+  { icon: '🎓', title: '新生入学', desc: '报到、缴费、账号激活、军训和新生材料。', action: '第一次来学校', page: '/pages/freshman/freshman' },
+  { icon: '🗺️', title: '校园地图', desc: '校园总图、快递取件、体育课地图与官方全景。', action: '找楼、取快递、找场馆', page: '/pages/map-detail/map-detail' },
+  { icon: '🔐', title: '数字校园', desc: '统一身份认证、WebVPN、CARSI 与图书馆服务。', action: '解决账号和网络', page: '/pages/digital/digital' },
+  { icon: '📚', title: '学业资料', desc: '培养方案、选修要求、微专业与课程真题。', action: '查课程、找资料', page: '/pages/academics/academics' },
+  { icon: '🏫', title: '办事大厅', desc: '重修、查卷、奖学金、毕业与论文手续。', action: '找表格、走流程', page: '/pages/services/services' },
+  { icon: '🌿', title: '校园生活', desc: '校历、体育、图书馆、学生规定和校园相册。', action: '日常学习生活', page: '/pages/campus-detail/campus-detail' }
 ];
 
 const STATS = [
@@ -241,15 +241,15 @@ const PLACES = [
 ];
 
 const ABOUT = {
-  title: '本项目与资料共建',
-  subtitle: '一个非官方的、公益的校园信息汇总项目',
-  subtitle2: '由学生整理，为学生服务',
-  purpose: '大学作为一个正厅架构的巨型单位，学校通知、学院通知、各种培养方案和信息庞杂，难寻出处。我们这个项目结合了群友的经验和对文件的整理，让新生和在校生更方便的获得资料，知道下一步该做什么。',
+  title: '关于本站与资料共建',
+  subtitle: '一个基于web公益站的非官方校园信息汇总小程序。',
+  subtitleSecond: '由学生整理，为学生服务。',
+  purpose: '学校通知、学院表格、群文件、培养方案和老生经验分散在不同入口。本站不替代学校官网，而是把常用信息重新分类，让新生和在校生能更快找到“下一步该做什么”。',
   sources: [
     '学校与学院公开发布的通知、指南、培养方案和表格。',
     '群友投稿的课程、体育和校园经验。',
     '用户上传并授权用于整理的校园地图与风景照片。',
-    '政策、收费、考试、学籍和毕业要求均以当年正式通知为准。'
+    '政策、收费、考试、学籍和毕业要求以正式通知为准。'
   ],
   contribution: [
     { step: '1', title: '纠错', desc: '指出过期链接、错误日期或不准确描述。' },

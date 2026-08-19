@@ -2,5 +2,7 @@
 .status-card { background: #fff; border-radius: 24rpx; padding: 48rpx 36rpx; text-align: center; box-shadow: 0 8rpx 28rpx rgba(15, 45, 75, .06); }
 .status-title { font-size: 34rpx; font-weight: 700; color: #1f2937; }
 .status-detail { margin-top: 20rpx; font-size: 28rpx; line-height: 1.7; color: #7b8794; }
-.retry-button { margin-top: 34rpx; width: 320rpx; border: 0; border-radius: 999rpx; background: #eaf4ff; color: #075ca8; font-weight: 700; }
-.retry-button::after { border: 0; }
+.retry-button, .download-button { width: 320rpx; border: 0; border-radius: 999rpx; font-weight: 700; }
+.retry-button { margin-top: 34rpx; background: #eaf4ff; color: #075ca8; }
+.download-button { margin-top: 18rpx; background: #f3f6f9; color: #34495e; }
+.retry-button::after, .download-button::after { border: 0; }

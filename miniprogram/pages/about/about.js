@@ -29,10 +29,10 @@ Page(Object.assign({
   },
 
   openRepo() {
-    getApp().openWeb(this.data.site.repoUrl, '是否复制 GitHub 仓库链接到浏览器打开？');
+    getApp().openWeb(this.data.site.repoUrl, '是否复制项目 GitHub 主库链接到浏览器打开？');
   },
 
   openTeam() {
-    getApp().openWeb(this.data.site.teamUrl, '是否复制 SYUCT 学生团队官网链接到浏览器打开？');
+    getApp().openWeb(this.data.site.orgUrl, '是否复制 GitHub 组织主页链接到浏览器打开？');
   }
 }, withShare()));

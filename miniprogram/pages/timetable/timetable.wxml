@@ -1,0 +1,211 @@
+<view class="page timetable-page">
+  <view class="timetable-hero">
+    <view class="hero-topline">
+      <view>
+        <view class="hero-kicker">{{state.settings.semester}}</view>
+        <view class="hero-title">{{heroTitle}}</view>
+      </view>
+      <view class="settings-button" bindtap="openSettings">设置</view>
+    </view>
+    <view class="hero-summary">
+      <view class="summary-main">{{weekSummaryPrefix}}：<text class="summary-week">第 {{selectedWeek}} 周</text></view>
+      <view class="summary-sub" wx:if="{{state.settings.firstWeekDate}}">第一周的周一 {{state.settings.firstWeekDate}}</view>
+      <view class="summary-sub" wx:else>先在设置里填写第一周的周一日期，即可自动计算当前周。</view>
+    </view>
+    <view class="week-controls">
+      <view class="week-button {{selectedWeek <= 1 ? 'is-disabled' : ''}}" bindtap="previousWeek">上一周</view>
+      <view class="week-current" bindtap="goCurrentWeek">回到本周</view>
+      <view class="week-button {{selectedWeek >= state.settings.totalWeeks ? 'is-disabled' : ''}}" bindtap="nextWeek">下一周</view>
+    </view>
+  </view>
+
+  <view class="action-grid">
+    <view class="action-card" bindtap="openAddCourse">
+      <view class="action-icon">＋</view>
+      <view class="action-title">添加课程</view>
+      <view class="action-desc">手动录入一门课</view>
+    </view>
+    <view class="action-card" bindtap="onImport">
+      <view class="action-icon">导</view>
+      <view class="action-title">导入课表</view>
+      <view class="action-desc">课表码 / JSON</view>
+    </view>
+    <view class="action-card" bindtap="onExport">
+      <view class="action-icon">享</view>
+      <view class="action-title">分享课表</view>
+      <view class="action-desc">课表码更简洁</view>
+    </view>
+  </view>
+
+  <view class="week-panel">
+    <view class="week-head">
+      <view class="week-head-main">
+        <view class="week-head-title">本周课程</view>
+        <view class="week-head-sub">{{weekCourseCount}} 个上课安排</view>
+      </view>
+      <view class="local-badge">仅存本机</view>
+    </view>
+
+    <scroll-view class="weekday-scroll" scroll-x="true" enhanced="true" show-scrollbar="false">
+      <view class="weekday-row">
+        <view class="weekday-item {{item.selected ? 'is-selected' : ''}} {{item.isToday ? 'is-today' : ''}}" wx:for="{{weekdays}}" wx:key="weekday" bindtap="selectWeekday" data-weekday="{{item.weekday}}">
+          <view class="weekday-name">{{item.label}}</view>
+          <view class="weekday-date">{{item.dateLabel || ' '}}</view>
+          <view class="weekday-count" wx:if="{{item.count}}">{{item.count}}</view>
+        </view>
+      </view>
+    </scroll-view>
+
+    <view class="course-list" wx:if="{{dayCourses.length}}">
+      <view class="course-card tone-{{item.colorIndex}}" wx:for="{{dayCourses}}" wx:key="id" bindtap="editCourse" data-id="{{item.id}}">
+        <view class="course-time">
+          <view class="course-section-row">
+            <view class="course-section">{{item.sectionLabel}}</view>
+            <view class="course-weeks">{{item.weekLabel}}</view>
+          </view>
+          <view class="course-clock" wx:if="{{item.timeLabel}}">{{item.timeLabel}}</view>
+        </view>
+        <view class="course-main">
+          <view class="course-name">{{item.name}}</view>
+          <view class="course-meta" wx:if="{{item.metaLabel}}">{{item.metaLabel}}</view>
+          <view class="course-edit">点击可编辑</view>
+        </view>
+        <view class="course-current" wx:if="{{item.isCurrent}}">当前</view>
+      </view>
+    </view>
+
+    <view class="empty-state" wx:else>
+      <view class="empty-icon">📅</view>
+      <view class="empty-title">这一天还没有课程</view>
+      <view class="empty-desc">可以自己添加，也可以导入同学分享的 SYUCT 课表码 / JSON。</view>
+      <view class="empty-actions">
+        <view class="empty-button primary" bindtap="openAddCourse">添加课程</view>
+        <view class="empty-button" bindtap="onImport">导入课表</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="data-note">
+    <view class="data-note-title">首次使用课表指南</view>
+    <view class="data-note-text">受限于手机端复制空间不足，课表会被截断。所以首次请打开校园指南网页，使用电脑端搭配教务处生成课表码，一次生成，半年够用。（或许你可以让班委宝宝生成呢，然后把课表码发班级群你直接用就行）</view>
+    <view class="data-note-text data-note-text-gap">本项目为公益站，没租用服务器，全程本地记忆，不用担心泄漏资料，采用四级封装存储，不强行清理微信数据不会重置，哪怕重置了再导入一次课表码就行。</view>
+  </view>
+
+  <view class="modal-mask" wx:if="{{showCourseModal}}" bindtap="closeCourseModal">
+    <view class="form-modal" catchtap="preventBubble">
+      <view class="modal-head">
+        <view>
+          <view class="modal-title">{{isEditingCourse ? '编辑课程' : '添加课程'}}</view>
+          <view class="modal-sub">同一门课有多个时间段时，可以分别添加。</view>
+        </view>
+        <view class="modal-close-text" bindtap="closeCourseModal">关闭</view>
+      </view>
+
+      <scroll-view class="form-scroll" scroll-y="true">
+        <view class="field-label">课程名称</view>
+        <view class="course-name-input-wrap">
+          <input class="field-input" value="{{courseForm.name}}" placeholder="例如：高等数学" maxlength="40" bindinput="onCourseNameInput" bindblur="onCourseNameBlur" />
+          <view class="course-name-suggestions" wx:if="{{courseNameSuggestions.length}}">
+            <view class="course-name-suggestion" wx:for="{{courseNameSuggestions}}" wx:key="*this" bindtap="chooseCourseNameSuggestion" data-name="{{item}}">{{item}}</view>
+          </view>
+        </view>
+
+        <view class="field-grid">
+          <view class="field-half">
+            <view class="field-label">教师</view>
+            <input class="field-input" value="{{courseForm.teacher}}" placeholder="选填" maxlength="40" bindinput="onCourseTeacherInput" />
+          </view>
+          <view class="field-half">
+            <view class="field-label">教室</view>
+            <input class="field-input" value="{{courseForm.room}}" placeholder="选填" maxlength="40" bindinput="onCourseRoomInput" />
+          </view>
+        </view>
+
+        <view class="field-label">星期</view>
+        <picker mode="selector" range="{{weekdayOptions}}" value="{{courseForm.weekdayIndex}}" bindchange="onCourseWeekdayChange">
+          <view class="field-picker">{{weekdayOptions[courseForm.weekdayIndex]}}</view>
+        </picker>
+
+        <view class="field-label">节次</view>
+        <picker mode="selector" range="{{sectionPairOptions}}" value="{{courseForm.sectionPairIndex}}" bindchange="onCourseSectionPairChange">
+          <view class="field-picker">{{courseForm.sectionPairDisplayLabel || sectionPairOptions[courseForm.sectionPairIndex]}}</view>
+        </picker>
+        <view class="field-help" wx:if="{{courseForm.preserveOriginalSection}}">这是旧课表中的非标准节次。不修改“节次”即可原样保留；如需调整，可从上面的五组成对节次中重新选择。</view>
+
+        <view class="field-grid">
+          <view class="field-half">
+            <view class="field-label">开始周</view>
+            <picker mode="selector" range="{{courseWeekOptions}}" value="{{courseForm.startWeekIndex}}" bindchange="onCourseStartWeekChange">
+              <view class="field-picker">{{courseWeekOptions[courseForm.startWeekIndex]}}</view>
+            </picker>
+          </view>
+          <view class="field-half">
+            <view class="field-label">结束周</view>
+            <picker mode="selector" range="{{courseWeekOptions}}" value="{{courseForm.endWeekIndex}}" bindchange="onCourseEndWeekChange">
+              <view class="field-picker">{{courseWeekOptions[courseForm.endWeekIndex]}}</view>
+            </picker>
+          </view>
+        </view>
+
+        <view class="field-label">周次规则</view>
+        <picker mode="selector" range="{{weekTypeOptions}}" value="{{courseForm.weekTypeIndex}}" bindchange="onCourseWeekTypeChange">
+          <view class="field-picker">{{weekTypeOptions[courseForm.weekTypeIndex]}}</view>
+        </picker>
+
+        <view class="form-actions">
+          <view class="save-button" bindtap="saveCourse">保存课程</view>
+          <view class="delete-button" wx:if="{{isEditingCourse}}" bindtap="deleteCourse">删除课程</view>
+        </view>
+      </scroll-view>
+    </view>
+  </view>
+
+  <view class="modal-mask" wx:if="{{showSettingsModal}}" bindtap="closeSettings">
+    <view class="form-modal settings-modal" catchtap="preventBubble">
+      <view class="modal-head">
+        <view>
+          <view class="modal-title">课表设置</view>
+          <view class="modal-sub">设置属于你的化大课表，并自动计算当前周。</view>
+        </view>
+        <view class="modal-close-text" bindtap="closeSettings">关闭</view>
+      </view>
+
+      <scroll-view class="settings-scroll" scroll-y="true">
+        <view class="field-label">你的名字</view>
+        <input class="field-input" value="{{settingsForm.titleName}}" placeholder="例如：小化" maxlength="6" bindinput="onTitleNameInput" />
+        <view class="field-help">用于课表标题，最多 6 个字，仅保存在本机；留空时显示“我的化大课表”。</view>
+
+        <view class="field-label">学期名称 <text class="field-label-note">（也可设置为大几上、下）</text></view>
+        <input class="field-input" value="{{settingsForm.semester}}" placeholder="例如：2026-2027-1 / 大二上" maxlength="40" bindinput="onSemesterInput" />
+
+        <view class="field-label">第一周的周一 <text class="field-label-note">（大部分开学日在第一周内）</text></view>
+        <picker mode="date" value="{{settingsForm.firstWeekDate}}" bindchange="onFirstWeekDateChange">
+          <view class="field-picker {{settingsForm.firstWeekDate ? '' : 'placeholder'}}">{{settingsForm.firstWeekDate || '选择日期'}}</view>
+        </picker>
+
+        <view class="field-label">学期总周数 <text class="field-label-note">（默认为 20）</text></view>
+        <picker mode="selector" range="{{totalWeekOptions}}" value="{{settingsForm.totalWeeksIndex}}" bindchange="onTotalWeeksChange">
+          <view class="field-picker">{{totalWeekOptions[settingsForm.totalWeeksIndex]}}</view>
+        </picker>
+
+        <view class="save-button settings-save" bindtap="saveSettings">保存设置</view>
+
+        <view class="settings-divider"></view>
+        <view class="settings-row" bindtap="restoreHistory">
+          <view>
+            <view class="settings-row-title">恢复最近一次修改</view>
+            <view class="settings-row-desc">当前有 {{historyCount}} 个本地历史备份</view>
+          </view>
+          <view class="settings-row-action">恢复</view>
+        </view>
+        <view class="settings-row" bindtap="openAbout">
+          <view>
+            <view class="settings-row-title">关于与共建</view>
+            <view class="settings-row-desc">查看项目说明、交流群和 GitHub</view>
+          </view>
+          <view class="settings-row-action">查看</view>
+        </view>
+      </scroll-view>
+    </view>
+  </view>
+</view>

@@ -2,6 +2,12 @@
 // Keeps the document-opening runtime in the main package so every PDF subpackage
 // only carries its own manifest/payload plus a tiny page entry.
 const { withShare } = require('./share');
+const BROWSER_LINK_BASE = 'https://www.syuct.top/';
+
+function browserUrlFor(file) {
+  const clean = String(file || '').replace(/^\/+/, '');
+  return clean ? BROWSER_LINK_BASE + clean : '';
+}
 
 const Z85_ALPHABET = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.-:+=^!/*?&<>()[]{}@%$#';
 const Z85_MAP = (() => {
@@ -53,12 +59,17 @@ function createNativeDocumentPage(manifest, payload) {
       status: '正在准备文档…',
       detail: '文档已内置在小程序中，请稍候。',
       opening: true,
-      canRetry: false
+      canRetry: false,
+      canBrowserDownload: false
     },
 
     onLoad(options) {
       this.file = decodeURIComponent((options && options.file) || '');
       this.documentTitle = decodeURIComponent((options && options.title) || '文档');
+      this.sourceFile = decodeURIComponent((options && options.source) || '');
+      if (!this.sourceFile && this.file) this.sourceFile = `docs/${this.file}`;
+      this.browserDownloadUrl = browserUrlFor(this.sourceFile);
+      this.setData({ canBrowserDownload: Boolean(this.browserDownloadUrl) });
       this.opening = false;
       wx.setNavigationBarTitle({ title: safeTitle(this.documentTitle) });
       this.openNativeDocument();
@@ -66,6 +77,28 @@ function createNativeDocumentPage(manifest, payload) {
 
     reopen() {
       this.openNativeDocument();
+    },
+
+    copyBrowserDownloadLink() {
+      if (!this.browserDownloadUrl) {
+        wx.showToast({ title: '下载链接不可用', icon: 'none' });
+        return;
+      }
+      wx.setClipboardData({
+        data: this.browserDownloadUrl,
+        success: () => {
+          wx.showModal({
+            title: '浏览器下载',
+            content: '下载链接已复制。请打开系统浏览器，粘贴访问该链接进行下载。',
+            showCancel: false,
+            confirmText: '知道了'
+          });
+        },
+        fail: error => {
+          console.error('copy browser download link failed:', error);
+          wx.showToast({ title: '复制失败，请重试', icon: 'none' });
+        }
+      });
     },
 
     openNativeDocument() {
@@ -164,7 +197,7 @@ function createNativeDocumentPage(manifest, payload) {
           this.opening = false;
           this.setData({
             status: '文档已打开',
-            detail: '从微信原生文档页返回后，可再次打开。',
+            detail: '从微信原生文档页返回后，可再次打开；如需保存文件，可复制链接到系统浏览器下载。',
             opening: false,
             canRetry: true
           });
@@ -185,6 +218,8 @@ function createNativeDocumentPage(manifest, payload) {
       this.opening = false;
       this.file = '';
       this.documentTitle = '';
+      this.sourceFile = '';
+      this.browserDownloadUrl = '';
     }
   }, withShare());
 }

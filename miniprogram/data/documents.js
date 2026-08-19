@@ -1,5 +1,5 @@
 // data/documents.js — 全站文档唯一数据源
-// 标题与分类同步自网页版 resources.html（v260809 基线，2026-08-14）。
+// 标题与分类同步自网页版 resources.html（v1.29 基线，2026-08-14）。
 // 页面只引用文档 ID，不再重复维护 title/file/category。
 
 const PREVIEWS = require('./previews.js');

@@ -19,7 +19,7 @@
           <view class="doc-description">{{doc.description}}</view>
           <view class="doc-meta">{{doc.note}}</view>
         </view>
-        <view class="list-arrow">›</view>
+        <view class="list-arrow">查看</view>
       </view>
     </view>
     <view class="section-block-lead section-post-note" wx:if="{{cat.postNote}}">{{cat.postNote}}</view>

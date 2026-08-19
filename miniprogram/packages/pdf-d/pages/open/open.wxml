@@ -3,5 +3,6 @@
     <view class="status-title">{{status}}</view>
     <view class="status-detail">{{detail}}</view>
     <button wx:if="{{canRetry}}" class="retry-button" bindtap="reopen">重新打开</button>
+    <button wx:if="{{canRetry && canBrowserDownload}}" class="download-button" bindtap="copyBrowserDownloadLink">浏览器下载</button>
   </view>
 </view>

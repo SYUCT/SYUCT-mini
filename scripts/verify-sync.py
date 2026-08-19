@@ -102,7 +102,7 @@ def check_documents() -> None:
         if 'preview' not in path.parts
     ]
     duplicated = []
-    pattern = re.compile(r"(?:file|title)\s*:\s*['\"](?:docs/)?")
+    pattern = re.compile(r"file\s*:\s*['\"]docs/")
     for path in page_js:
         text = path.read_text(encoding='utf-8')
         if pattern.search(text) or "'docs/" in text or '"docs/' in text:
@@ -127,7 +127,7 @@ def check_documents() -> None:
         if expected_id not in search_result.get(query, []):
             fail(f'搜索词“{query}”不能命中 {expected_id}')
 
-    ok('42 份资料 ID、路径唯一，关键标题与网页版 v260809 基线对齐')
+    ok('42 份资料 ID、路径唯一，关键标题与网页版 v1.29 基线对齐')
     ok('业务页面不再重复维护 docs/... 文档元数据')
     ok('常用新旧名称和关键词搜索正常')
 
@@ -137,10 +137,11 @@ def check_versions_and_config() -> None:
     site = run_node_json(
         "const d=require('./data/content'); console.log(JSON.stringify(d.SITE));"
     )
-    if site.get('sourceVersion') != 'v260809':
-        fail('sourceVersion 应为 v260809')
-    if site.get('version') != 'v1.3.2-mini':
-        fail('小程序版本应为 v1.3.2-mini')
+    if site.get('sourceVersion') != 'v1.29':
+        fail('sourceVersion 应为 v1.29')
+    release_version = str(site.get('version') or '')
+    if not re.fullmatch(r'v\d+\.\d+\.\d+-mini', release_version):
+        fail(f'小程序版本格式无效：{release_version or "<空>"}，应类似 v1.4.5-mini')
     if site.get('sourceRevision') != '20260814' or site.get('updatedAt') != '2026-08-14':
         fail('网页版同步修订日期应为 2026-08-14')
 
@@ -148,6 +149,15 @@ def check_versions_and_config() -> None:
     root_value = str(config.get('miniprogramRoot') or '').replace('\\', '/').rstrip('/') + '/'
     if root_value != 'miniprogram/':
         fail(f'project.config.json 的 miniprogramRoot 应为 miniprogram/，实际 {root_value}')
+
+    app_cfg = json.loads(ROOT.joinpath('app.json').read_text(encoding='utf-8'))
+    if app_cfg.get('lazyCodeLoading') != 'requiredComponents':
+        fail('app.json 必须保持 lazyCodeLoading=requiredComponents，避免主包页面注入回归')
+
+    for rel in ('pages/map/map.js', 'pages/map-detail/map-detail.js', 'pages/campus/campus.js', 'pages/campus-detail/campus-detail.js'):
+        text = ROOT.joinpath(rel).read_text(encoding='utf-8')
+        if 'utils/page' in text or 'map-page' in text or 'campus-page' in text:
+            fail(f'{rel} 不应依赖页面工厂或 utils/page.js')
 
     setting = config.get('setting', {})
     if setting.get('ignoreUploadUnusedFiles') is not False or setting.get('ignoreDevUnusedFiles') is not False:
@@ -224,6 +234,59 @@ def check_tab_icons() -> None:
         fail('首页与资料图标仍然重复')
     ok('首页与资料 Tab 图标已区分')
 
+
+
+
+
+def check_timetable_feature() -> None:
+    print('\n=== 5A. 本地课表、课表码与 JSON 分享 ===')
+    app = json.loads(ROOT.joinpath('app.json').read_text(encoding='utf-8'))
+    tab_list = app.get('tabBar', {}).get('list', [])
+    tab_paths = [item.get('pagePath') for item in tab_list]
+    if len(tab_list) != 5:
+        fail(f'TabBar 应保持 5 项，实际 {len(tab_list)}')
+    if 'pages/timetable/timetable' not in tab_paths:
+        fail('TabBar 缺少课表入口')
+    if 'pages/about/about' in tab_paths:
+        fail('关于页仍占用底部 Tab，应从首页/课表设置进入')
+    if 'pages/about/about' not in app.get('pages', []):
+        fail('关于页被误删')
+    for icon in ('tab-timetable.png', 'tab-timetable-active.png'):
+        if not ROOT.joinpath('assets/tab', icon).exists():
+            fail(f'缺少课表 Tab 图标：{icon}')
+
+    required_files = [
+        'pages/timetable/timetable.js',
+        'pages/timetable/timetable.json',
+        'pages/timetable/timetable.wxml',
+        'pages/timetable/timetable.wxss',
+        'utils/timetable-store.js',
+        'utils/timetable-codec.js',
+    ]
+    for rel in required_files:
+        if not ROOT.joinpath(rel).exists():
+            fail(f'课表功能缺少文件：{rel}')
+
+    page_js = ROOT.joinpath('pages/timetable/timetable.js').read_text(encoding='utf-8')
+    page_wxml = ROOT.joinpath('pages/timetable/timetable.wxml').read_text(encoding='utf-8')
+    store_js = ROOT.joinpath('utils/timetable-store.js').read_text(encoding='utf-8')
+    codec_js = ROOT.joinpath('utils/timetable-codec.js').read_text(encoding='utf-8')
+    for token in ('wx.chooseMessageFile', 'wx.shareFileMessage', 'writeExportFile', 'parseImportText', 'createShareCode'):
+        if token not in page_js and token not in store_js:
+            fail(f'课表 JSON 导入/分享能力缺少：{token}')
+    for token in ('wx.setStorageSync', 'wx.env.USER_DATA_PATH', 'HISTORY_LIMIT = 5', "FORMAT = 'syuct-timetable'"):
+        if token not in store_js:
+            fail(f'课表本地持久化能力缺少：{token}')
+    for token in ('SYUCT-TT2:', 'encodeShareCode', 'decodeShareCode', 'checksum'):
+        if token not in codec_js:
+            fail(f'课表码编解码能力缺少：{token}')
+    for token in ('添加课程', '导入课表', '分享课表', '仅存本机'):
+        if token not in page_wxml:
+            fail(f'课表页面缺少关键入口：{token}')
+    if '关于与共建' not in ROOT.joinpath('pages/index/index.wxml').read_text(encoding='utf-8'):
+        fail('关于页移出 Tab 后，首页没有保留入口')
+    ok('课表保持 5 项底栏结构，本地双份存储 + 5 次历史备份已接入')
+    ok('短课表码支持校验与剪贴板自动解码，同时兼容 JSON 文件和原始 JSON')
 
 
 def check_home_navigation_stack() -> None:
@@ -370,7 +433,7 @@ def check_web_content_sync() -> None:
     if 'ack-entry' not in about or 'openAcknowledgements' not in about or 'openDoc(doc.file, doc.title)' not in about_js:
         fail('关于页“共建”下方致谢名单入口未完整接入')
     ok('关于页“共建”下方已接入致谢名单微信原生预览')
-    ok('首页五项常问、六大栏目、资料说明和官方全景已按网页版 v260809 基线对齐')
+    ok('首页五项常问、六大栏目、资料说明和官方全景已按网页版 v1.29 基线对齐')
 
 
 def read_image_size(path: Path) -> tuple[int, int]:
@@ -420,7 +483,7 @@ def check_groups_and_maps() -> None:
     if 'copyCommunityGroup' not in index_wxml or 'copyCommunityGroup' not in about_wxml:
         fail('交流群复制事件未统一接入')
     if '查看加群二维码' in index_wxml or ROOT.joinpath('assets/qq-group.png').exists():
-        fail('v260809 已取消二维码，但小程序仍保留旧二维码入口或资源')
+        fail('v1.29 已取消二维码，但小程序仍保留旧二维码入口或资源')
 
     app = json.loads(ROOT.joinpath('app.json').read_text(encoding='utf-8'))
     package_index = {item.get('root'): item for item in app.get('subPackages', []) or app.get('subpackages', [])}
@@ -454,14 +517,13 @@ def check_groups_and_maps() -> None:
             fail(f'{package_root} 分包过大：{package_size / 1024:.1f} KiB')
         ok(f'{package_root} 约 {package_size / 1024:.1f} KiB')
 
-    map_factory = ROOT.joinpath('utils/map-page.js').read_text(encoding='utf-8')
-    if 'packages/maps-main/pages/viewer/viewer' not in map_factory or 'packages/maps-delivery/pages/viewer/viewer' not in map_factory:
-        fail('utils/map-page.js 未按地图类型路由到两个高清分包')
     for page in ['pages/map/map', 'pages/map-detail/map-detail']:
         js = ROOT.joinpath(page + '.js').read_text(encoding='utf-8')
         wxml = ROOT.joinpath(page + '.wxml').read_text(encoding='utf-8')
-        if 'createMapPage' not in js:
-            fail(f'{page}.js 未接入统一地图页工厂')
+        if 'Page(Object.assign({' not in js or 'openMapViewer' not in js:
+            fail(f'{page}.js 未使用稳定的直接 Page 注册或缺少地图打开逻辑')
+        if 'packages/maps-main/pages/viewer/viewer' not in js or 'packages/maps-delivery/pages/viewer/viewer' not in js:
+            fail(f'{page}.js 未按地图类型路由到两个高清分包')
         if 'openMapViewer' not in wxml or not re.search(r'class="map-image"[^>]*mode="aspectFit"', wxml):
             fail(f'{page}.wxml 地图缩略图或点击逻辑异常')
 
@@ -491,7 +553,7 @@ def check_groups_and_maps() -> None:
     if '/packages/gallery/assets/' not in gallery_viewer or 'wx.previewImage' not in gallery_viewer:
         fail('高清校园相册查看器配置异常')
 
-    ok('新生群与贴吧群按 v260809 统一维护，旧二维码已清理')
+    ok('新生群与贴吧群按 v1.29 统一维护，旧二维码已清理')
     # 加群只保留“复制群号”：不允许快捷加群/一键加群按钮、QQ 网页加群链接与
     # “微信小程序无法直接唤起 QQ”类提示框。
     freshman_wxml = ROOT.joinpath('pages/freshman/freshman.wxml').read_text(encoding='utf-8')
@@ -590,6 +652,7 @@ def main() -> None:
     check_versions_and_config()
     check_wxml_handlers()
     check_tab_icons()
+    check_timetable_feature()
     check_home_navigation_stack()
     check_web_content_sync()
     check_groups_and_maps()

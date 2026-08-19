@@ -41,7 +41,7 @@
           <view class="doc-description">{{item.description}}</view>
           <view class="doc-meta">{{item.note}}</view>
         </view>
-        <view class="list-arrow">›</view>
+        <view class="list-arrow">查看</view>
       </view>
     </view>
   </view>

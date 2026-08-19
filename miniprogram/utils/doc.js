@@ -14,6 +14,11 @@ function baseNameOf(file) {
   return String(file || '').split('/').pop();
 }
 
+function webUrlFor(file) {
+  const clean = String(file || '').replace(/^\/+/, '');
+  return clean ? LINK_BASE + clean : '';
+}
+
 function requestLinkCopy(file, title, options) {
   const config = options || {};
   const app = getApp();
@@ -22,7 +27,7 @@ function requestLinkCopy(file, title, options) {
   app.confirmCopy({
     title: config.modalTitle || '在浏览器中查看',
     content: config.content || `「${displayTitle}」暂不能在小程序内预览，是否复制网页链接？`,
-    text: LINK_BASE + file,
+    text: webUrlFor(file),
     confirmText: '复制链接'
   });
 }
@@ -40,7 +45,8 @@ function openDoc(file, title) {
     wx.navigateTo({
       url: `${meta.root}/pages/open/open` +
         `?file=${encodeURIComponent(baseName)}` +
-        `&title=${encodeURIComponent(title || baseName)}`
+        `&title=${encodeURIComponent(title || baseName)}` +
+        `&source=${encodeURIComponent(file)}`
     });
     return;
   }
@@ -73,4 +79,4 @@ function openUrl(url, hint) {
   });
 }
 
-module.exports = { openDoc, openUrl, PREVIEWS, LINK_BASE };
+module.exports = { openDoc, openUrl, PREVIEWS, LINK_BASE, webUrlFor };

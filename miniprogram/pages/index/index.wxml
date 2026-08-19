@@ -54,7 +54,7 @@
           <view class="quick-title">{{item.title}}</view>
           <view class="quick-desc">{{item.desc}}</view>
         </view>
-        <view class="quick-arrow">›</view>
+        <view class="quick-arrow">查看</view>
       </view>
     </view>
   </view>
@@ -65,7 +65,7 @@
         <view class="eyebrow">{{home.galleryEyebrow}}</view>
         <view class="section-title">{{home.galleryTitle}}</view>
       </view>
-      <view class="gallery-more" bindtap="openCampusGallery">查看完整相册 →</view>
+      <view class="gallery-more" bindtap="openCampusGallery">查看完整相册</view>
     </view>
     <view class="home-gallery-grid">
       <view class="home-gallery-item {{index == 0 ? 'home-gallery-feature' : ''}}" wx:for="{{home.featuredGallery}}" wx:key="file" bindtap="previewHomeImage" data-index="{{item.viewerIndex}}">
@@ -79,14 +79,14 @@
     <view class="community-text">
       <view class="eyebrow">交流与共建</view>
       <view class="community-title">资料有遗漏，欢迎一起补全</view>
-      <view class="community-desc">QQ群 {{site.qqGroup}}。入群可获取更新，也可以提交经验、表格和纠错。</view>
+      <view class="community-desc">如果您对项目有所补充或对共建团队感兴趣，请点击下方共建详情页按钮。</view>
     </view>
-    <view class="btn-secondary community-btn" bindtap="openGroupModal">查看交流群</view>
+    <view class="btn-secondary community-btn" bindtap="openAbout">查看详情页</view>
   </view>
 
   <view class="site-footer">
     <view>非官方学生共建站，请以学校当年正式通知为准。</view>
-    <view class="footer-links" bindtap="openSite">沈阳化工大学官网 ↗</view>
+    <view class="footer-link-row"><text class="footer-links" bindtap="openAbout">关于与共建</text><text class="footer-sep">·</text><text class="footer-links" bindtap="openSite">沈阳化工大学官网</text></view>
     <view class="footer-update">内容基线：网页版 {{site.sourceVersion}} · {{site.updatedAt}}</view>
   </view>
 

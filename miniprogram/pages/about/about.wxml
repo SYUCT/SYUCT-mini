@@ -9,12 +9,11 @@
 
   <view class="page-head about-page-head">
     <view class="page-title">{{about.title}}</view>
-    <view class="page-sub">{{about.subtitle}}</view>
-    <view class="page-sub about-sub2">{{about.subtitle2}}</view>
+    <view class="page-sub"><view>{{about.subtitle}}</view><view>{{about.subtitleSecond}}</view></view>
   </view>
 
   <view class="card">
-    <view class="card-title">📖 为什么诞生了这个项目</view>
+    <view class="card-title">📖 为什么做这个站</view>
     <view class="about-text">{{about.purpose}}</view>
   </view>
 
@@ -67,25 +66,25 @@
     <view class="list-row" bindtap="openSite">
       <view class="list-icon">🌐</view>
       <view class="list-main"><view class="list-title">校园指南网页版</view><view class="list-desc">日常分享优先使用 www.syuct.top</view></view>
-      <view class="list-arrow">↗</view>
+      <view class="list-arrow">打开</view>
     </view>
     <view class="list-row" bindtap="openOfficial">
       <view class="list-icon">🏛️</view>
       <view class="list-main"><view class="list-title">沈阳化工大学官网</view><view class="list-desc">政策和正式通知以学校官网为准</view></view>
-      <view class="list-arrow">↗</view>
+      <view class="list-arrow">打开</view>
     </view>
     <view class="list-row" bindtap="openRepo">
       <view class="list-icon">🐙</view>
-      <view class="list-main"><view class="list-title">项目 GitHub 仓库</view><view class="list-desc">查看源码、更新记录或提交修改</view></view>
-      <view class="list-arrow">↗</view>
+      <view class="list-main"><view class="list-title">项目github主库</view><view class="list-desc">帮我们团队点点star和fork，谢谢大家喵～。</view></view>
+      <view class="list-arrow">打开</view>
     </view>
     <view class="list-row" bindtap="openTeam">
-      <view class="list-icon">🧑‍🤝‍🧑</view>
-      <view class="list-main"><view class="list-title">SYUCT 学生团队官网</view><view class="list-desc">点击进入 GitHub 组织首页 - 非学校官方机构</view></view>
-      <view class="list-arrow">↗</view>
+      <view class="list-icon">🤝</view>
+      <view class="list-main"><view class="list-title">加入共建团队</view><view class="list-desc">点击访问GitHub组织首页，qq群内申请加入。</view></view>
+      <view class="list-arrow">打开</view>
     </view>
   </view>
 
-  <view class="callout warning">本小程序为非官方-学生共建项目。涉及政策、收费、考试、学籍、培养方案和毕业要求的内容，请始终以学校及学院当年正式通知为准。</view>
+  <view class="callout warning">本站为非官方学生共建项目。涉及政策、收费、考试、学籍、培养方案和毕业要求的内容，请始终以学校及学院当年正式通知为准。</view>
   <view class="page-footer">内容基线 {{site.sourceVersion}} · {{site.updatedAt}}</view>
 </view>

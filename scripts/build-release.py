@@ -19,7 +19,10 @@ def read_version() -> str:
     match = re.search(r"\bversion:\s*'([^']+)'", text)
     if not match:
         raise SystemExit('无法读取 SITE.version')
-    return match.group(1)
+    version = match.group(1)
+    if not re.fullmatch(r'v\d+\.\d+\.\d+-mini', version):
+        raise SystemExit(f'SITE.version 格式无效：{version}，应类似 v1.4.5-mini')
+    return version
 
 
 def run_checks() -> None:

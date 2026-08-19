@@ -43,7 +43,7 @@
             <view class="doc-description">{{doc.description}}</view>
             <view class="doc-meta">{{doc.note}}</view>
           </view>
-          <view class="list-arrow">›</view>
+          <view class="list-arrow">查看</view>
         </view>
       </view>
     </view>
@@ -56,7 +56,7 @@
       <view class="list-title">💻 网页版资料中心</view>
       <view class="list-desc">查看网页端最新栏目、完整在线预览与更新记录</view>
     </view>
-    <view class="list-arrow">↗</view>
+    <view class="list-arrow">打开</view>
   </view>
 
   <view class="contribute-tip">📮 投稿请加首页群聊</view>

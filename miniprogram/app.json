@@ -3,6 +3,7 @@
     "pages/index/index",
     "pages/freshman/freshman",
     "pages/map/map",
+    "pages/timetable/timetable",
     "pages/map-detail/map-detail",
     "pages/digital/digital",
     "pages/academics/academics",
@@ -123,6 +124,12 @@
         "selectedIconPath": "assets/tab/tab-map-active.png"
       },
       {
+        "pagePath": "pages/timetable/timetable",
+        "text": "课表",
+        "iconPath": "assets/tab/tab-timetable.png",
+        "selectedIconPath": "assets/tab/tab-timetable-active.png"
+      },
+      {
         "pagePath": "pages/resources/resources",
         "text": "资料",
         "iconPath": "assets/tab/tab-docs.png",
@@ -133,19 +140,13 @@
         "text": "生活",
         "iconPath": "assets/tab/tab-life.png",
         "selectedIconPath": "assets/tab/tab-life-active.png"
-      },
-      {
-        "pagePath": "pages/about/about",
-        "text": "关于",
-        "iconPath": "assets/tab/tab-about.png",
-        "selectedIconPath": "assets/tab/tab-about-active.png"
       }
     ]
   },
   "sitemapLocation": "sitemap.json",
   "style": "v2",
-  "lazyCodeLoading": "requiredComponents",
   "usingComponents": {
     "landmark-hero": "/components/landmark-hero/landmark-hero"
-  }
+  },
+  "lazyCodeLoading": "requiredComponents"
 }
