@@ -97,18 +97,10 @@ function encodeShareCode(payload) {
   return `${PREFIX}${checksum(body)}:${body}`;
 }
 
-function decodeShareCode(input) {
-  const text = String(input == null ? '' : input).replace(/^\uFEFF/, '').trim();
-  if (!text.startsWith(PREFIX)) throw new Error('不是有效的 SYUCT 课表码');
-  if (text.length > MAX_CODE_LENGTH) throw new Error('课表码过长');
-
-  const encoded = text.slice(PREFIX.length);
-  if (encoded.length < 10 || encoded.charAt(8) !== ':') throw new Error('课表码头部损坏');
-  const expectedChecksum = encoded.slice(0, 8).toLowerCase();
-  if (!/^[0-9a-f]{8}$/.test(expectedChecksum)) throw new Error('课表码校验信息损坏');
-  const body = encoded.slice(9);
-  if (checksum(body) !== expectedChecksum) throw new Error('课表码内容不完整，请重新复制');
-
+// body 各字段自带长度前缀，解析到哪里结束就是课表码的真实边界。
+// 必须先解析出边界、再对边界内的内容算校验和：否则用户粘贴时一起带上的
+// 前后文（"课表码：xxx"、结尾的一句话、包裹的引号）会被算进校验和而误判为损坏。
+function parseBody(body) {
   let cursor = 0;
   let part = readPackedText(body, cursor);
   const semester = part.value;
@@ -162,23 +154,44 @@ function decodeShareCode(input) {
     }));
   }
 
-  if (cursor !== body.length) throw new Error('课表码末尾存在异常内容');
-
   return {
-    format: 'syuct-timetable',
-    version: 1,
-    semester,
-    settings: {
+    cursor,
+    result: {
+      format: 'syuct-timetable',
+      version: 1,
       semester,
-      firstWeekDate,
-      totalWeeks
-    },
-    courses
+      settings: {
+        semester,
+        firstWeekDate,
+        totalWeeks
+      },
+      courses
+    }
   };
 }
 
+function decodeShareCode(input) {
+  const text = String(input == null ? '' : input);
+  if (text.length > MAX_CODE_LENGTH) throw new Error('课表码过长');
+
+  const start = text.indexOf(PREFIX);
+  if (start < 0) throw new Error('不是有效的 SYUCT 课表码');
+
+  const encoded = text.slice(start + PREFIX.length);
+  if (encoded.length < 10 || encoded.charAt(8) !== ':') throw new Error('课表码头部损坏');
+  const expectedChecksum = encoded.slice(0, 8).toLowerCase();
+  if (!/^[0-9a-f]{8}$/.test(expectedChecksum)) throw new Error('课表码校验信息损坏');
+
+  const rest = encoded.slice(9);
+  const parsed = parseBody(rest);
+  if (checksum(rest.slice(0, parsed.cursor)) !== expectedChecksum) {
+    throw new Error('课表码内容不完整，请重新复制');
+  }
+  return parsed.result;
+}
+
 function isShareCode(text) {
-  return String(text == null ? '' : text).replace(/^\uFEFF/, '').trim().startsWith(PREFIX);
+  return String(text == null ? '' : text).indexOf(PREFIX) >= 0;
 }
 
 module.exports = {

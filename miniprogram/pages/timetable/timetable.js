@@ -428,7 +428,13 @@ Page(Object.assign({
         if (!res.confirm) return;
         const state = store.normalizeState(this.data.state);
         state.courses = state.courses.filter((item) => item.id !== id);
-        const saved = store.saveState(state);
+        let saved;
+        try {
+          saved = store.saveState(state);
+        } catch (e) {
+          wx.showToast({ title: e.message || '删除失败', icon: 'none' });
+          return;
+        }
         this.setData({ state: saved, showCourseModal: false, historyCount: store.getHistory().length }, () => this.refreshSchedule());
         wx.showToast({ title: '已删除', icon: 'success' });
       }
@@ -601,14 +607,38 @@ Page(Object.assign({
     } else {
       next = store.normalizeState(current);
       next.courses = store.mergeCourses(current.courses, incoming.courses);
+      // 只补自己没填的开学日期，不要连学期名和总周数一起换掉：
+      // 导入的 totalWeeks 偏小会让超出范围的周次再也翻不到。
       if (!next.settings.firstWeekDate && incoming.settings.firstWeekDate) {
-        next.settings = incoming.settings;
+        next.settings.firstWeekDate = incoming.settings.firstWeekDate;
       }
     }
-    const saved = store.saveState(next);
+    let saved;
+    try {
+      saved = store.saveState(next);
+    } catch (e) {
+      wx.showToast({ title: e.message || '导入失败', icon: 'none' });
+      return;
+    }
     this.setData({ state: saved, historyCount: store.getHistory().length });
     this.reloadState(true);
-    wx.showToast({ title: mode === 'replace' ? '课表已导入' : '课程已合并', icon: 'success' });
+
+    const doneTitle = mode === 'replace' ? '课表已导入' : '课程已合并';
+    // 课表码里通常不带开学日期，缺了它周次相关的功能全都不准，
+    // 所以趁用户注意力还在导入结果上引导一次，而不是只留一行静态提示。
+    if (!saved.settings.firstWeekDate) {
+      wx.showModal({
+        title: doneTitle,
+        content: `已有 ${saved.courses.length} 门课程。\n还差开学第一周的周一日期——填了才能自动跳到本周、并高亮正在上的课。`,
+        confirmText: '现在填写',
+        cancelText: '稍后',
+        success: (res) => {
+          if (res.confirm) this.openSettings();
+        }
+      });
+      return;
+    }
+    wx.showToast({ title: doneTitle, icon: 'success' });
   },
 
   onExport() {

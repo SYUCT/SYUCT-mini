@@ -152,24 +152,41 @@ function writeFileBackup(state) {
   try {
     const path = getBackupPath();
     if (!path) return false;
-    wx.getFileSystemManager().writeFileSync(path, JSON.stringify(state, null, 2), 'utf8');
+    wx.getFileSystemManager().writeFileSync(path, JSON.stringify(state), 'utf8');
     return true;
   } catch (e) {
     return false;
   }
 }
 
+// 两份数据的同步由 saveState 负责。loadState 只读取和恢复，不主动回写较旧的一份，
+// 否则 storage 被写坏后切一次 tab 就会用坏数据覆盖掉唯一的好备份。
 function loadState() {
+  let fromStorage = null;
   try {
     const stored = wx.getStorageSync(MAIN_KEY);
-    if (stored && typeof stored === 'object') {
-      const state = normalizeState(stored);
-      writeFileBackup(state);
-      return state;
-    }
+    if (stored && typeof stored === 'object') fromStorage = normalizeState(stored);
   } catch (e) {}
 
   const fromFile = readFileBackup();
+
+  if (fromStorage && fromFile) {
+    // updatedAt 相同时以课程多的一份为准：normalizeCourse 会静默丢弃缺 name 的课程，
+    // 课程数骤降说明这一份已被污染。
+    const preferFile = fromFile.updatedAt > fromStorage.updatedAt
+      || (fromFile.updatedAt === fromStorage.updatedAt && fromFile.courses.length > fromStorage.courses.length);
+    if (preferFile) {
+      try { wx.setStorageSync(MAIN_KEY, fromFile); } catch (e) {}
+      return fromFile;
+    }
+    return fromStorage;
+  }
+
+  if (fromStorage) {
+    writeFileBackup(fromStorage);
+    return fromStorage;
+  }
+
   if (fromFile) {
     try { wx.setStorageSync(MAIN_KEY, fromFile); } catch (e) {}
     return fromFile;
@@ -206,7 +223,6 @@ function pushHistory(state) {
 function saveState(nextState, options) {
   const opts = options || {};
   const current = loadState();
-  if (opts.snapshot !== false) pushHistory(current);
   const next = normalizeState(nextState);
   next.updatedAt = Date.now();
   try {
@@ -215,6 +231,8 @@ function saveState(nextState, options) {
     throw new Error('课表本地缓存保存失败');
   }
   writeFileBackup(next);
+  // 历史快照放在主数据落盘之后：存储空间吃紧时优先保住当前课表。
+  if (opts.snapshot !== false) pushHistory(current);
   return next;
 }
 
@@ -284,7 +302,16 @@ function createExportPayload(state) {
 
 function parseImportText(text) {
   const source = String(text || '').replace(/^\uFEFF/, '').trim();
-  const raw = codec.isShareCode(source) ? codec.decodeShareCode(source) : JSON.parse(source);
+  let raw;
+  if (codec.isShareCode(source)) {
+    raw = codec.decodeShareCode(source);
+  } else {
+    try {
+      raw = JSON.parse(source);
+    } catch (e) {
+      throw new Error('没识别到课表码，请重新复制完整内容');
+    }
+  }
   if (raw && raw.format === FORMAT && Array.isArray(raw.courses)) {
     return normalizeState({
       settings: raw.settings || { semester: raw.semester },

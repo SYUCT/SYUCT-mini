@@ -62,6 +62,17 @@
   opacity: 0.82;
 }
 
+/* 缺开学日期时这行是个待办入口，比普通说明文字更醒目 */
+.summary-sub-link {
+  display: inline-block;
+  margin-top: 12rpx;
+  padding: 8rpx 20rpx;
+  border-radius: 999rpx;
+  background: rgba(255, 255, 255, 0.16);
+  font-weight: 600;
+  opacity: 1;
+}
+
 .week-controls {
   display: flex;
   gap: 12rpx;
