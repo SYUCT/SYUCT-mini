@@ -28,17 +28,27 @@ for package_root,docs in PACKAGES.items():
         path=SRC/name
         if not path.exists(): raise SystemExit(f'missing source: {path}')
         raw=path.read_bytes(); ext=path.suffix.lower().lstrip('.')
-        packed=brotli.compress(raw,quality=9); text=z85(packed)
+        packed=brotli.compress(raw,quality=11); text=z85(packed)
         manifest[name]={'offset':cursor,'chars':len(text),'byteLength':len(raw),'compressedLength':len(packed),
             'cacheName':f"syuct-{path.stem}-{hashlib.sha256(raw).hexdigest()[:12]}.{ext}",'fileType':ext}
         payload.append(text); cursor+=len(text)
     all_text=''.join(payload); n=len(all_text); bounds=[round(i*n/CHUNKS) for i in range(CHUNKS+1)]
+    # 先估体积再落盘：超限时直接退出，避免把分包写坏后还要 git 回滚。
+    manifest_text='module.exports = '+json.dumps(manifest,ensure_ascii=False,indent=2)+';\n'
+    reqs=',\n  '.join([f"require('./payload-{i+1:02d}.js')" for i in range(CHUNKS)])
+    payload_index="module.exports = [\n  "+reqs+"\n].join('');\n"
+    projected=(
+        sum(p.stat().st_size for p in (ROOT/package_root).rglob('*')
+            if p.is_file() and p.parent != data_dir)
+        + n + CHUNKS*len("module.exports='';\n")
+        + len(manifest_text.encode('utf-8')) + len(payload_index)
+    )
+    if projected>=MAX: raise SystemExit(f'{package_root} would be too large: {projected/1048576:.3f} MiB (nothing written)')
     for i in range(CHUNKS):
         part=all_text[bounds[i]:bounds[i+1]]
         (data_dir/f'payload-{i+1:02d}.js').write_text("module.exports='"+part+"';\n",encoding='ascii',newline='')
-    reqs=',\n  '.join([f"require('./payload-{i+1:02d}.js')" for i in range(CHUNKS)])
-    (data_dir/'payload.js').write_text("module.exports = [\n  "+reqs+"\n].join('');\n",encoding='ascii')
-    (data_dir/'manifest.js').write_text('module.exports = '+json.dumps(manifest,ensure_ascii=False,indent=2)+';\n',encoding='utf-8')
+    (data_dir/'payload.js').write_text(payload_index,encoding='ascii')
+    (data_dir/'manifest.js').write_text(manifest_text,encoding='utf-8')
     size=sum(p.stat().st_size for p in (ROOT/package_root).rglob('*') if p.is_file())
     if size>=MAX: raise SystemExit(f'{package_root} too large: {size/1048576:.3f} MiB')
     print(f'{package_root}: {size/1048576:.3f} MiB')

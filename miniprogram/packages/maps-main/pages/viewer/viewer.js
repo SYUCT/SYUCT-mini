@@ -11,9 +11,9 @@ const MAPS = {
   'sports-map': {
     id: 'sports-map',
     title: '体育课专用地图',
-    src: '/packages/maps-main/assets/sports-map.png',
+    src: '/packages/maps-main/assets/sports-map.webp',
     resolution: '1455 × 2048',
-    format: 'PNG'
+    format: 'WebP'
   }
 };
 

@@ -440,6 +440,21 @@ def read_image_size(path: Path) -> tuple[int, int]:
     data = path.read_bytes()
     if data.startswith(b'\x89PNG\r\n\x1a\n') and len(data) >= 24:
         return int.from_bytes(data[16:20], 'big'), int.from_bytes(data[20:24], 'big')
+    if data.startswith(b'RIFF') and data[8:12] == b'WEBP' and len(data) >= 30:
+        chunk = data[12:16]
+        if chunk == b'VP8L':
+            bits = int.from_bytes(data[21:25], 'little')
+            return (bits & 0x3FFF) + 1, ((bits >> 14) & 0x3FFF) + 1
+        if chunk == b'VP8 ':
+            return (
+                int.from_bytes(data[26:28], 'little') & 0x3FFF,
+                int.from_bytes(data[28:30], 'little') & 0x3FFF,
+            )
+        if chunk == b'VP8X':
+            return (
+                int.from_bytes(data[24:27], 'little') + 1,
+                int.from_bytes(data[27:30], 'little') + 1,
+            )
     if data.startswith(b'\xff\xd8'):
         offset = 2
         while offset + 9 < len(data):
@@ -499,7 +514,7 @@ def check_groups_and_maps() -> None:
 
     expected_images = {
         ROOT / 'packages/maps-main/assets/campus-map.jpg': (1400, 2000),
-        ROOT / 'packages/maps-main/assets/sports-map.png': (1400, 2000),
+        ROOT / 'packages/maps-main/assets/sports-map.webp': (1400, 2000),
         ROOT / 'packages/maps-delivery/assets/delivery-pickup-overview.jpg': (1400, 1000),
         ROOT / 'packages/maps-delivery/assets/delivery-haochijie-layout.jpg': (1600, 900),
     }
