@@ -658,7 +658,10 @@ def check_landmarks_and_main_package() -> None:
     ) + size
     if total_packages >= 20 * 1024 * 1024:
         fail(f'主包 + 分包总量超过 20 MiB：{total_packages / 1024 / 1024:.2f} MiB')
-    ok(f'主包 + 分包原始运行文件约 {total_packages / 1024 / 1024:.2f} MiB')
+    if total_packages >= 18 * 1024 * 1024:
+        print(f'  ⚠️  主包 + 分包约 {total_packages / 1024 / 1024:.2f} MiB，接近 20 MiB 上限')
+    else:
+        ok(f'主包 + 分包原始运行文件约 {total_packages / 1024 / 1024:.2f} MiB')
     ok('六个网页版校园地标已压缩并接入统一页首组件')
 
 def main() -> None:

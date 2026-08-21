@@ -221,7 +221,31 @@ function createNativeDocumentPage(manifest, payload) {
       this.sourceFile = '';
       this.browserDownloadUrl = '';
     }
-  }, withShare());
+  }, withShare({
+    // 分享路径必须带上 file/title/source：this.route 不含 query，
+    // 少了这些参数接收方会落在"文档不可用"且「浏览器下载」按钮被隐藏的死页面上。
+    shareApp: (page) => {
+      const route = page.route ? `/${page.route}` : '';
+      // 自己就是从坏链接进来的（file 为空）时指向首页，别再传播一个死链接。
+      if (!route || !page.file) return { path: '/pages/index/index' };
+      const query = `file=${encodeURIComponent(page.file)}` +
+        `&title=${encodeURIComponent(page.documentTitle || page.file)}` +
+        `&source=${encodeURIComponent(page.sourceFile || '')}`;
+      return {
+        title: `沈化校园指南 · ${page.documentTitle || '资料'}`,
+        path: `${route}?${query}`
+      };
+    },
+    shareTimeline: (page) => {
+      if (!page.file) return {};
+      return {
+        title: `沈化校园指南 · ${page.documentTitle || '资料'}`,
+        query: `file=${encodeURIComponent(page.file)}` +
+          `&title=${encodeURIComponent(page.documentTitle || page.file)}` +
+          `&source=${encodeURIComponent(page.sourceFile || '')}`
+      };
+    }
+  }));
 }
 
 module.exports = {
