@@ -1,14 +1,14 @@
 module.exports = {
   "engineering-management-plan-2025.docx": {
     "offset": 0,
-    "chars": 640290,
-    "byteLength": 520393,
-    "compressedLength": 512229,
-    "cacheName": "syuct-engineering-management-plan-2025-75dc228a19bc.docx",
+    "chars": 592445,
+    "byteLength": 480555,
+    "compressedLength": 473954,
+    "cacheName": "syuct-engineering-management-plan-2025-df152ae2efb9.docx",
     "fileType": "docx"
   },
   "carsi-guide.pdf": {
-    "offset": 640290,
+    "offset": 592445,
     "chars": 581950,
     "byteLength": 510004,
     "compressedLength": 465560,
@@ -16,7 +16,7 @@ module.exports = {
     "fileType": "pdf"
   },
   "pe-electives-experience.pdf": {
-    "offset": 1222240,
+    "offset": 1174395,
     "chars": 573265,
     "byteLength": 479982,
     "compressedLength": 458610,

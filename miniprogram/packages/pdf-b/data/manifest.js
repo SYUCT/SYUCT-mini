@@ -1,14 +1,14 @@
 module.exports = {
   "graduation-self-check.docx": {
     "offset": 0,
-    "chars": 1621470,
-    "byteLength": 1361674,
-    "compressedLength": 1297173,
-    "cacheName": "syuct-graduation-self-check-5506bfcafe5c.docx",
+    "chars": 1455535,
+    "byteLength": 1207211,
+    "compressedLength": 1164428,
+    "cacheName": "syuct-graduation-self-check-caabcdb96951.docx",
     "fileType": "docx"
   },
   "summer-campus-stay-2026.pdf": {
-    "offset": 1621470,
+    "offset": 1455535,
     "chars": 131945,
     "byteLength": 110921,
     "compressedLength": 105554,
@@ -16,7 +16,7 @@ module.exports = {
     "fileType": "pdf"
   },
   "electives-2026-2027.xlsx": {
-    "offset": 1753415,
+    "offset": 1587480,
     "chars": 24530,
     "byteLength": 103304,
     "compressedLength": 19624,
@@ -24,7 +24,7 @@ module.exports = {
     "fileType": "xlsx"
   },
   "student-record-change-application-2020.docx": {
-    "offset": 1777945,
+    "offset": 1612010,
     "chars": 16645,
     "byteLength": 15132,
     "compressedLength": 13314,
