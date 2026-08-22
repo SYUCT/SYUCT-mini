@@ -88,12 +88,15 @@ syuct-miniprogram/
 ## 校验
 
 ```bash
+node scripts/test-timetable.js    # 课表码、导入容错、双份存储、分享路径回归（85 项断言）
 python3 scripts/verify-sync.py     # 内容同步、分包与主包/总包体积
 python3 scripts/verify-pdfs.py     # 39 份文档端到端还原 + 3 MiB 路由一致性
 python3 scripts/verify-require.py  # 静态相对 require 路径可解析
 ```
 
-`verify-pdfs.py` 需要 `brotli`：`pip3 install brotli`。三个脚本在 push 和 PR 时由 GitHub Actions 自动执行。
+`verify-pdfs.py` 需要 `brotli`：`pip3 install brotli`。以上脚本连同全量 `node --check` 在 push 和 PR 时由 GitHub Actions 自动执行。
+
+`test-timetable.js` 直接 require 运行目录里的真实模块（不复制被测逻辑），以内存桩替换 Storage 与文件系统，因此能覆盖"一份数据损坏、另一份完好"这类仲裁路径。
 
 打包发布：
 
