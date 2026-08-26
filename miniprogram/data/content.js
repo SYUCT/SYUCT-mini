@@ -58,7 +58,7 @@ const HOME = {
 };
 
 const PORTALS = [
-  { icon: '🎓', title: '新生入学', desc: '报到、缴费、账号激活、军训和新生材料。', action: '第一次来学校', page: '/pages/freshman/freshman' },
+  { icon: '🎓', title: '新生入学', desc: '报到、缴费、空调缴费、账号激活和新生材料。', action: '第一次来学校', page: '/pages/freshman/freshman' },
   { icon: '🗺️', title: '校园地图', desc: '校园总图、快递取件、体育课地图与官方全景。', action: '找楼、取快递、找场馆', page: '/pages/map-detail/map-detail' },
   { icon: '🔐', title: '数字校园', desc: '统一身份认证、WebVPN、CARSI 与图书馆服务。', action: '解决账号和网络', page: '/pages/digital/digital' },
   { icon: '📚', title: '学业资料', desc: '培养方案、选修要求、微专业与课程真题。', action: '查课程、找资料', page: '/pages/academics/academics' },
@@ -70,7 +70,7 @@ const STATS = [
   { value: '9 月 3 日', label: '2026 级新生报到' },
   { value: '9.5—9.18', label: '新生军训' },
   { value: '9 月 21 日', label: '新生开始上课' },
-  { value: '44 项', label: '核心资料与地图' },
+  { value: '45 项', label: '核心资料与地图' },
   { value: '4 张', label: '实用导航地图' },
   { value: '1170264357', label: '学生交流群' }
 ];
@@ -137,7 +137,7 @@ const FRESHMAN = {
     { title: '激活校园账号', desc: '统一身份认证会关联后续的教务、网络与消息通知。', link: '/pages/digital/digital' },
     { title: '保存校园导航', desc: '提前确认宿舍、食堂、学院、报到点和快递取件位置。', link: '/pages/map-detail/map-detail' }
   ],
-  paymentText: '新生缴费方式、时间和项目以入学指南及学校财务通知为准。有生源地信用助学贷款需求的同学，可查看下方辽宁分行参考资料；实际办理以当地学生资助管理中心和贷款合同为准。',
+  paymentText: '新生缴费方式、时间和项目以入学指南及学校财务通知为准。下方两份参考资料：生源地信用助学贷款的实际办理以当地学生资助管理中心和贷款合同为准；宿舍空调用电需要自己在后勤微服务里充值，按流程图操作即可。',
   paymentWarning: '谨防“代缴费、提前选宿舍、内部绿色通道”等诈骗。学校收费应以正式平台与通知为准。',
   firstWeek: [
     { step: '1', title: '完成报到', desc: '按学院安排核验身份、提交材料、领取物品。' },
@@ -181,8 +181,8 @@ const SERVICES = {
 
 const CAMPUS = {
   landmark: LANDMARKS.campus,
-  title: '校历、体育、图书馆与规章',
-  subtitle: '把每天会遇到的学习生活信息集中到一个页面，也保留几处属于沈化校园的真实印象。',
+  title: '社团、校历、体育与校园日常',
+  subtitle: '课堂之外会用到的校园信息集中在一页，也保留几处属于沈化校园的真实印象。',
   gallery: [
     { img: 'gallery-tree-path.jpg', label: '林荫小路', file: '/assets/gallery-thumbs/gallery-tree-path.jpg', viewerIndex: 0 },
     { img: 'gallery-campus-dusk.jpg', label: '雨后晚霞广场', file: '/assets/gallery-thumbs/gallery-campus-dusk.jpg', viewerIndex: 1 },

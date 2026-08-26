@@ -22,5 +22,13 @@ module.exports = {
     "compressedLength": 172554,
     "cacheName": "syuct-physical-fitness-score-tables-5a8fac597f49.pdf",
     "fileType": "pdf"
+  },
+  "campus-power-payment-guide.pdf": {
+    "offset": 716880,
+    "chars": 218835,
+    "byteLength": 259030,
+    "compressedLength": 175066,
+    "cacheName": "syuct-campus-power-payment-guide-9383668a5652.pdf",
+    "fileType": "pdf"
   }
 };

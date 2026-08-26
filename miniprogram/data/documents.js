@@ -39,6 +39,13 @@ const RAW_DOCUMENTS = [
     tags: ['国家生源地信用助学贷款', '国家开发银行', '辽宁分行', '2026', '助学贷款', '生源地贷款', '学费', '住宿费', '生活费', '申请', '95593', '新生入学']
   },
   {
+    id: 'campus-power-payment-guide',
+    title: '校园电费缴费操作流程',
+    file: 'docs/campus-power-payment-guide.pdf',
+    category: '校园生活',
+    tags: ['校园电费', '电费', '空调', '空调用电', '空调续费', '缴费', '充值', '后勤管理处', '微服务', '宿舍', '服务号', '公众号']
+  },
+  {
     id: 'unified-identity-guide',
     title: '统一身份认证使用指南',
     file: 'docs/unified-identity-guide.pdf',
@@ -324,6 +331,7 @@ const DOC_DESCRIPTIONS = {
   '2026-new-student-guide': '含报到须知、缴费、住宿、银行业务与数字迎新说明。',
   'student-origin-credit-loan-liaoning-2026': '国家开发银行辽宁分行资料，集中说明申请对象、所需材料、办理渠道、办理时间与还款示例；实际要求以当地学生资助管理中心及贷款合同为准。',
   'unified-identity-guide': '第一次使用数字校园前，按指南绑定微信并激活账号。',
+  'campus-power-payment-guide': '宿舍空调用电需自行充值。四步截图演示：微信搜索“沈阳化工大学后勤”服务号，进入微服务选择“空调用电续费”，登录核对户号后选择金额提交。',
   'hometown-groups': '按需下载查看，群信息可能变化，加入前请核验群名与管理员。',
   'electives-2026-2027': '用于筛选课程名称、类别和开课信息。',
   'computer-science-plan-2025': '专业介绍、培养目标、毕业要求、课程体系与学分安排。',
@@ -501,6 +509,15 @@ const SECTION_GROUPS = {
   ],
   campus: [
     {
+      id: 'clubs',
+      name: '社团招新',
+      icon: '🎪',
+      lead: '每年 9–10 月为集中招新期。收到的社团招新简章会陆续汇总到这里，可以直接在小程序里打开。',
+      emptyTitle: '招新简章征集中',
+      emptyDesc: '网页版校园社区有社团招新汇总帖，目前已有社团在里面发布招新信息，可以先去那边看看。社团负责人也可以把招新文档发给共建团队，一起汇总到小程序里。',
+      ids: []
+    },
+    {
       id: 'calendar',
       name: '校历与作息',
       icon: '📅',
@@ -613,6 +630,8 @@ function getSectionGroups(section) {
     postCallout: group.postCallout || '',
     postWarning: group.postWarning || '',
     postNote: group.postNote || '',
+    emptyTitle: group.emptyTitle || '',
+    emptyDesc: group.emptyDesc || '',
     items: getDocumentsByIds(group.ids)
   }));
 }

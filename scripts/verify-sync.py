@@ -59,8 +59,8 @@ def check_documents() -> None:
     docs = run_node_json(
         "const d=require('./data/documents'); console.log(JSON.stringify(d.DOCUMENTS));"
     )
-    if len(docs) != 42:
-        fail(f'文档数量应为 42，实际 {len(docs)}')
+    if len(docs) != 43:
+        fail(f'文档数量应为 43，实际 {len(docs)}')
 
     ids = [item['id'] for item in docs]
     files = [item['file'] for item in docs]
@@ -127,7 +127,7 @@ def check_documents() -> None:
         if expected_id not in search_result.get(query, []):
             fail(f'搜索词“{query}”不能命中 {expected_id}')
 
-    ok('42 份资料 ID、路径唯一，关键标题与网页版 v1.29 基线对齐')
+    ok('43 份资料 ID、路径唯一，关键标题与网页版 v1.29 基线对齐')
     ok('业务页面不再重复维护 docs/... 文档元数据')
     ok('常用新旧名称和关键词搜索正常')
 
@@ -333,8 +333,8 @@ def check_web_content_sync() -> None:
         fail('首页“新生最常问”未与网页版五项入口对齐')
 
     stats = {item.get('label'): item.get('value') for item in content.get('STATS', [])}
-    if stats.get('核心资料与地图') != '44 项':
-        fail('首页核心资料与地图统计未同步为 44 项')
+    if stats.get('核心资料与地图') != '45 项':
+        fail('首页核心资料与地图统计未同步为 45 项')
     if stats.get('实用导航地图') != '4 张':
         fail('首页导航地图统计未同步为 4 张')
     if content.get('SITE', {}).get('siteUrl') != 'https://www.syuct.top/':
@@ -343,12 +343,14 @@ def check_web_content_sync() -> None:
         fail('校园地图缺少网页版官方全景入口')
 
     fresh = content.get('FRESHMAN', {})
-    expected_payment = '新生缴费方式、时间和项目以入学指南及学校财务通知为准。有生源地信用助学贷款需求的同学，可查看下方辽宁分行参考资料；实际办理以当地学生资助管理中心和贷款合同为准。'
+    expected_payment = '新生缴费方式、时间和项目以入学指南及学校财务通知为准。下方两份参考资料：生源地信用助学贷款的实际办理以当地学生资助管理中心和贷款合同为准；宿舍空调用电需要自己在后勤微服务里充值，按流程图操作即可。'
     if fresh.get('paymentText') != expected_payment:
         fail('新生页缴费与助学贷款精简文案不一致')
     freshman_wxml = ROOT.joinpath('pages/freshman/freshman.wxml').read_text(encoding='utf-8')
     if '缴费、银行卡与助学贷款' not in freshman_wxml or '生源地助学贷款资料' not in freshman_wxml or 'loanDoc.title' not in freshman_wxml:
         fail('新生页未展示精简后的助学贷款资料入口')
+    if '宿舍空调电费缴费流程' not in freshman_wxml or 'powerDoc.title' not in freshman_wxml:
+        fail('新生页缴费栏缺少空调电费缴费入口')
     if 'loan-callout' in freshman_wxml or 'loanDoc.description' in freshman_wxml:
         fail('新生页助学贷款区域仍存在重复说明')
 
@@ -375,7 +377,10 @@ def check_web_content_sync() -> None:
             '校园事务与录像调阅',
             '毕业与论文',
         ],
+        # “社团招新”为小程序特有栏目：网页版的招新信息在校园社区（讨论帖形式），
+        # 小程序无社区功能，改以文档汇总承载，故此处与网页版栏目不完全一致。
         'campus': [
+            '社团招新',
             '校历与作息',
             '体育、校园跑与体测',
             '图书馆与学习',

@@ -11,7 +11,7 @@ module.exports = {
     "root": "/packages/pdf-b",
     "mode": "native-document",
     "sourceBytes": 1361674,
-    "packedBytes": 1361674,
+    "packedBytes": 1207211,
     "fileType": "docx"
   },
   "summer-campus-stay-2026.pdf": {
@@ -172,7 +172,7 @@ module.exports = {
     "root": "/packages/pdf-g",
     "mode": "native-document",
     "sourceBytes": 520393,
-    "packedBytes": 520393,
+    "packedBytes": 480555,
     "fileType": "docx"
   },
   "carsi-guide.pdf": {
@@ -271,6 +271,13 @@ module.exports = {
     "mode": "native-document",
     "sourceBytes": 179909,
     "packedBytes": 179909,
+    "fileType": "pdf"
+  },
+  "campus-power-payment-guide.pdf": {
+    "root": "/packages/pdf-i",
+    "mode": "native-document",
+    "sourceBytes": 259030,
+    "packedBytes": 259030,
     "fileType": "pdf"
   }
 };

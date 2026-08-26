@@ -10,6 +10,7 @@ Page(Object.assign({
     fresh: FRESHMAN,
     guide: getSectionGroups('freshman')[0],
     loanDoc: DOCUMENT_INDEX['student-origin-credit-loan-liaoning-2026'],
+    powerDoc: DOCUMENT_INDEX['campus-power-payment-guide'],
     site: SITE,
     communityGroups: COMMUNITY_GROUPS
   },

@@ -177,10 +177,6 @@
   vertical-align: middle;
 }
 
-.guide-docs {
-  margin-top: 18rpx;
-}
-
 .payment-warning {
   margin-left: 0;
   margin-right: 0;

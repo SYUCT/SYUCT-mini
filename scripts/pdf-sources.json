@@ -56,7 +56,8 @@
     "packages/pdf-i": [
       "competition-management-supplement-2025.pdf",
       "competition-management-reward-2024.pdf",
-      "physical-fitness-score-tables.pdf"
+      "physical-fitness-score-tables.pdf",
+      "campus-power-payment-guide.pdf"
     ]
   },
   "documents": [
@@ -317,6 +318,12 @@
       "sourceBytes": 11049757,
       "internal": false,
       "quality": "external-link"
+    },
+    {
+      "file": "campus-power-payment-guide.pdf",
+      "sourceBytes": 259030,
+      "internal": true,
+      "quality": "original"
     }
   ]
 }

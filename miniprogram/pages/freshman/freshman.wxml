@@ -32,18 +32,6 @@
         </view>
       </view>
     </view>
-
-    <view class="section-card guide-docs">
-      <view class="list-row" wx:for="{{guide.items}}" wx:key="id" bindtap="openDoc" data-file="{{item.file}}" data-title="{{item.title}}">
-        <view class="list-icon">📄</view>
-        <view class="list-main">
-          <view class="list-title">{{item.title}}</view>
-          <view class="doc-description">{{item.description}}</view>
-          <view class="doc-meta">{{item.note}}</view>
-        </view>
-        <view class="list-arrow">查看</view>
-      </view>
-    </view>
   </view>
 
   <view class="section-block" id="payment">
@@ -56,6 +44,15 @@
           <view class="list-title loan-doc-title">生源地助学贷款资料</view>
           <view class="doc-meta">{{loanDoc.note}}</view>
         </view>
+        <view class="list-arrow">查看</view>
+      </view>
+      <view class="list-row" bindtap="openDoc" data-file="{{powerDoc.file}}" data-title="{{powerDoc.title}}">
+        <view class="list-icon">📄</view>
+        <view class="list-main">
+          <view class="list-title">宿舍空调电费缴费流程</view>
+          <view class="doc-meta">{{powerDoc.note}}</view>
+        </view>
+        <view class="list-arrow">查看</view>
       </view>
     </view>
     <view class="callout warning payment-warning">安全提醒：{{fresh.paymentWarning}}</view>
@@ -70,6 +67,22 @@
           <view class="step-title">{{item.title}}</view>
           <view class="step-desc">{{item.desc}}</view>
         </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="section-block" id="materials">
+    <view class="section-block-title"><text>{{guide.icon}}</text><text>{{guide.name}}</text></view>
+    <view class="section-block-lead">{{guide.lead}}</view>
+    <view class="section-card">
+      <view class="list-row" wx:for="{{guide.items}}" wx:key="id" bindtap="openDoc" data-file="{{item.file}}" data-title="{{item.title}}">
+        <view class="list-icon">📄</view>
+        <view class="list-main">
+          <view class="list-title">{{item.title}}</view>
+          <view class="doc-description">{{item.description}}</view>
+          <view class="doc-meta">{{item.note}}</view>
+        </view>
+        <view class="list-arrow">查看</view>
       </view>
     </view>
   </view>

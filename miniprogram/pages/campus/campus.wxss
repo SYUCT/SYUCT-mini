@@ -30,6 +30,47 @@
   margin-top: 6rpx;
 }
 
+/* 栏目空态：兼作投稿征集入口，收到文档后自动被列表替换 */
+.section-empty {
+  background: var(--card);
+  border: 1rpx dashed #c9d8e8;
+  border-radius: 20rpx;
+  padding: 44rpx 32rpx 36rpx;
+  text-align: center;
+}
+
+.section-empty-icon {
+  font-size: 56rpx;
+  line-height: 1;
+}
+
+.section-empty-title {
+  font-size: 29rpx;
+  font-weight: 700;
+  color: var(--primary);
+  margin-top: 16rpx;
+}
+
+.section-empty-desc {
+  font-size: 24rpx;
+  color: var(--text-secondary);
+  line-height: 1.75;
+  margin-top: 12rpx;
+  text-align: left;
+}
+
+.section-empty-actions {
+  display: flex;
+  gap: 16rpx;
+  margin-top: 28rpx;
+}
+
+.section-empty-btn {
+  flex: 1;
+  padding: 18rpx 12rpx;
+  font-size: 26rpx;
+}
+
 /* 相册 */
 .gallery-grid {
   display: grid;

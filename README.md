@@ -12,14 +12,14 @@
 
 ## 关于本项目
 
-一站式校园信息汇总，由学生整理、为学生服务。小程序端**不依赖任何服务器**：42 份资料、校园地图和课表功能全部内置在包体内，课表数据只保存在本机，不经过任何后端。
+一站式校园信息汇总，由学生整理、为学生服务。小程序端**不依赖任何服务器**：43 份资料、校园地图和课表功能全部内置在包体内，课表数据只保存在本机，不经过任何后端。
 
 | | |
 |---|---|
 | 小程序版本 | `v1.4.5-mini` |
 | 同步的网页版版本 | `v1.29` |
 | 内容同步日期 | `2026-08-14` |
-| 资料数量 | 42 份（另有 1 份致谢文档）；39 份内置原生打开，4 份超 3 MiB 走网页版 |
+| 资料数量 | 43 份（另有 1 份致谢文档）；40 份内置原生打开，4 份超 3 MiB 走网页版 |
 | 网页版 | [www.syuct.top](https://www.syuct.top/) · 仓库 `SYUCT/SYUCT-web` |
 | 小程序仓库 | `SYUCT/SYUCT-mini` |
 
@@ -75,7 +75,7 @@ syuct-miniprogram/
 
 ## 结构与体积优化
 
-微信限制：主包 ≤ 2 MiB，单个分包 ≤ 2 MiB，主包 + 全部分包 ≤ 20 MiB。当前主包约 1.18 MiB、总量约 17.43 MiB。
+微信限制：主包 ≤ 2 MiB，单个分包 ≤ 2 MiB，主包 + 全部分包 ≤ 20 MiB。当前主包约 1.19 MiB、总量约 17.65 MiB。
 
 - 工作区和运行目录分离，避免版本更新时反复导入工程。
 - 九个原生文档分包共用 `utils/native-document.js`，文档打开逻辑只维护一份。
@@ -90,7 +90,7 @@ syuct-miniprogram/
 ```bash
 node scripts/test-timetable.js    # 课表码、导入容错、双份存储、分享路径回归（85 项断言）
 python3 scripts/verify-sync.py     # 内容同步、分包与主包/总包体积
-python3 scripts/verify-pdfs.py     # 39 份文档端到端还原 + 3 MiB 路由一致性
+python3 scripts/verify-pdfs.py     # 40 份文档端到端还原 + 3 MiB 路由一致性
 python3 scripts/verify-require.py  # 静态相对 require 路径可解析
 ```
 

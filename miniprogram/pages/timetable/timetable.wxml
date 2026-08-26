@@ -89,7 +89,7 @@
     <view class="data-note-title">首次使用课表指南</view>
     <view class="data-note-text">受限手机系统，课表会被截断。首次请打开电脑端校园指南网页，搭配教务处生成课表码，一次生成，半年够用。（或许你可以让班委宝宝生成，把课表码发班级群你直接用就行）</view>
     <view class="data-note-text data-note-text-gap">本项目为公益站，没租用服务器，全程本地记忆，不用担心泄漏资料，采用四级封装存储，不强行清理微信数据不会重置，哪怕重置了再导入一次课表码就行。</view>
-    <view class="data-note-text data-note-text-gap">校园指南网页版会分享 26 级部分专业的课表码。</view>
+    <view class="data-note-text data-note-text-gap data-note-link" bindtap="openCommunity">校园指南网页版的校园社区有少部分专业的 26 级课表码分享，可以先去看看有没有自己的 ›</view>
   </view>
 
   <view class="modal-mask" wx:if="{{showCourseModal}}" bindtap="closeCourseModal">

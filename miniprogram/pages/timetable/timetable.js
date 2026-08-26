@@ -1,6 +1,7 @@
 const store = require('../../utils/timetable-store');
 const { withShare } = require('../../utils/share');
 const { searchCoursePresets } = require('../../data/timetable-course-presets');
+const { SITE } = require('../../data/content');
 const SHARE_TITLE = 'SYUCT 校园指南 · 我的课表';
 
 const WEEKDAY_OPTIONS = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
@@ -697,6 +698,13 @@ Page(Object.assign({
         if (message) wx.showToast({ title: message, icon: 'none', duration: 2200 });
       }
     });
+  },
+
+  openCommunity() {
+    getApp().openWeb(
+      `${SITE.siteUrl}community.html`,
+      '课表码分享在网页版的校园社区里。是否复制链接到浏览器打开？'
+    );
   },
 
   preventBubble() {}

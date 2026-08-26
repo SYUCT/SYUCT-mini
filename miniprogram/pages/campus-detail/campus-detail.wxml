@@ -12,7 +12,7 @@
     <view class="section-block-title"><text class="section-block-icon">{{section.icon}}</text><text>{{section.name}}</text></view>
     <view class="section-block-lead" wx:if="{{section.lead}}">{{section.lead}}</view>
     <view class="callout compact" wx:if="{{section.preCallout}}">{{section.preCallout}}</view>
-    <view class="section-card">
+    <view class="section-card" wx:if="{{section.items.length}}">
       <view class="list-row" wx:for="{{section.items}}" wx:key="id" wx:for-item="doc" bindtap="openDoc" data-file="{{doc.file}}" data-title="{{doc.title}}">
         <view class="list-icon">📄</view>
         <view class="list-main">
@@ -21,6 +21,16 @@
           <view class="doc-meta">{{doc.note}}</view>
         </view>
         <view class="list-arrow">查看</view>
+      </view>
+    </view>
+
+    <view class="section-empty" wx:elif="{{section.emptyTitle}}">
+      <view class="section-empty-icon">📮</view>
+      <view class="section-empty-title">{{section.emptyTitle}}</view>
+      <view class="section-empty-desc">{{section.emptyDesc}}</view>
+      <view class="section-empty-actions">
+        <view class="btn-primary section-empty-btn" bindtap="openCommunity">去网页版社区看</view>
+        <view class="btn-secondary section-empty-btn" bindtap="openContribute">我要投稿</view>
       </view>
     </view>
     <view class="section-block-lead section-post-note" wx:if="{{section.postNote}}">{{section.postNote}}</view>
@@ -39,5 +49,5 @@
     </view>
   </view>
 
-  <view class="page-footer">校历、体育和假期安排以当期正式通知为准</view>
+  <view class="page-footer">社团招新、校历、体育和假期安排以当期正式通知为准</view>
 </view>

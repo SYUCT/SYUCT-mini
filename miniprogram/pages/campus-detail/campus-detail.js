@@ -39,5 +39,16 @@ Page(Object.assign({
   openDoc(e) {
     const dataset = (e && e.currentTarget && e.currentTarget.dataset) || {};
     openDoc(dataset.file, dataset.title);
+  },
+
+  openCommunity() {
+    getApp().openWeb(
+      `${SITE.siteUrl}community.html`,
+      '社团招新帖在网页版的校园社区里。是否复制链接到浏览器打开？'
+    );
+  },
+
+  openContribute() {
+    wx.navigateTo({ url: '/pages/about/about' });
   }
 }, withShare()));
