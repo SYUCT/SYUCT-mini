@@ -22,7 +22,7 @@ const COMMUNITY_GROUPS = [
 ];
 
 const SITE = {
-  version: 'v1.4.5-mini',
+  version: 'v1.5.0-mini',
   sourceVersion: 'v1.29',
   sourceRevision: '20260814',
   updatedAt: '2026-08-14',
