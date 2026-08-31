@@ -4,6 +4,7 @@
     "pages/freshman/freshman",
     "pages/map/map",
     "pages/timetable/timetable",
+    "pages/timetable-grid/timetable-grid",
     "pages/map-detail/map-detail",
     "pages/digital/digital",
     "pages/academics/academics",

@@ -43,7 +43,10 @@
         <view class="week-head-title">本周课程</view>
         <view class="week-head-sub">{{weekCourseCount}} 个上课安排</view>
       </view>
-      <view class="local-badge">仅存本机</view>
+      <view class="week-head-actions">
+        <view class="grid-entry" bindtap="openGridView">全览</view>
+        <view class="local-badge">仅存本机</view>
+      </view>
     </view>
 
     <scroll-view class="weekday-scroll" scroll-x="true" enhanced="true" show-scrollbar="false">

@@ -30,5 +30,13 @@ module.exports = {
     "compressedLength": 175066,
     "cacheName": "syuct-campus-power-payment-guide-9383668a5652.pdf",
     "fileType": "pdf"
+  },
+  "esports-club-recruit-2026.doc": {
+    "offset": 935715,
+    "chars": 3930,
+    "byteLength": 12800,
+    "compressedLength": 3142,
+    "cacheName": "syuct-esports-club-recruit-2026-949802d32fd2.doc",
+    "fileType": "doc"
   }
 };

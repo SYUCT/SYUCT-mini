@@ -57,7 +57,8 @@
       "competition-management-supplement-2025.pdf",
       "competition-management-reward-2024.pdf",
       "physical-fitness-score-tables.pdf",
-      "campus-power-payment-guide.pdf"
+      "campus-power-payment-guide.pdf",
+      "esports-club-recruit-2026.doc"
     ]
   },
   "documents": [
@@ -322,6 +323,12 @@
     {
       "file": "campus-power-payment-guide.pdf",
       "sourceBytes": 259030,
+      "internal": true,
+      "quality": "original"
+    },
+    {
+      "file": "esports-club-recruit-2026.doc",
+      "sourceBytes": 12800,
       "internal": true,
       "quality": "original"
     }

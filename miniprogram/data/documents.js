@@ -39,6 +39,13 @@ const RAW_DOCUMENTS = [
     tags: ['国家生源地信用助学贷款', '国家开发银行', '辽宁分行', '2026', '助学贷款', '生源地贷款', '学费', '住宿费', '生活费', '申请', '95593', '新生入学']
   },
   {
+    id: 'esports-club-recruit-2026',
+    title: '电竞社招新通知',
+    file: 'docs/esports-club-recruit-2026.doc',
+    category: '校园生活',
+    tags: ['电竞社', '电竞', '社团', '社团招新', '招新', '学生社团', '游戏', '赛事', '开黑', '综测加分', '骨干招募', '社长']
+  },
+  {
     id: 'campus-power-payment-guide',
     title: '校园电费缴费操作流程',
     file: 'docs/campus-power-payment-guide.pdf',
@@ -332,6 +339,7 @@ const DOC_DESCRIPTIONS = {
   'student-origin-credit-loan-liaoning-2026': '国家开发银行辽宁分行资料，集中说明申请对象、所需材料、办理渠道、办理时间与还款示例；实际要求以当地学生资助管理中心及贷款合同为准。',
   'unified-identity-guide': '第一次使用数字校园前，按指南绑定微信并激活账号。',
   'campus-power-payment-guide': '宿舍空调用电需自行充值。四步截图演示：微信搜索“沈阳化工大学后勤”服务号，进入微服务选择“空调用电续费”，登录核对户号后选择金额提交。',
+  'esports-club-recruit-2026': '含社团活动介绍、报名条件与骨干招募要求，文末有负责人 QQ。招新时间与名额以社团最新通知为准。',
   'hometown-groups': '按需下载查看，群信息可能变化，加入前请核验群名与管理员。',
   'electives-2026-2027': '用于筛选课程名称、类别和开课信息。',
   'computer-science-plan-2025': '专业介绍、培养目标、毕业要求、课程体系与学分安排。',
@@ -515,7 +523,8 @@ const SECTION_GROUPS = {
       lead: '每年 9–10 月为集中招新期。收到的社团招新简章会陆续汇总到这里，可以直接在小程序里打开。',
       emptyTitle: '招新简章征集中',
       emptyDesc: '网页版校园社区有社团招新汇总帖，目前已有社团在里面发布招新信息，可以先去那边看看。社团负责人也可以把招新文档发给共建团队，一起汇总到小程序里。',
-      ids: []
+      postNote: '想让自己社团的招新简章出现在这里，可以把文档发给共建团队，或先到网页版校园社区的招新汇总帖回复。',
+      ids: ['esports-club-recruit-2026']
     },
     {
       id: 'calendar',

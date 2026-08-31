@@ -325,8 +325,78 @@ safely('4. 数据归一化', () => {
   const mergedMore = store.mergeCourses(makeState(3).courses, makeState(5).courses);
   check('合并保留新增课程', mergedMore.length === 5, String(mergedMore.length));
   check('合并后 id 唯一', new Set(mergedMore.map((c) => c.id)).size === mergedMore.length);
+});
 
-  // ------------------------------------------------------------- 文档页分享路径
+// ------------------------------------------------- 多教师同课合并（教务系统拆行）
+
+safely('4b. 多教师同课合并', () => {
+  // 教务系统里一门课多位教师会被拆成多行，除 teacher/colorIndex 外字段全同
+  const sameCourse = (teacher, over) => Object.assign({
+    name: '形势与政策', teacher, room: '通明楼(原5#教学楼)234',
+    weekday: 2, startSection: 1, endSection: 2,
+    startWeek: 9, endWeek: 12, weekType: 'all'
+  }, over || {});
+
+  const three = store.normalizeState({
+    settings: { semester: 'x', totalWeeks: 20 },
+    courses: [sameCourse('丁华'), sameCourse('张英'), sameCourse('李丙文')]
+  });
+  check('三条拆行合并成一门课', three.courses.length === 1, String(three.courses.length));
+  check('教师并列且保持原顺序', three.courses[0].teacher === '丁华、张英、李丙文', three.courses[0].teacher);
+  check('其余字段取首条', three.courses[0].room === '通明楼(原5#教学楼)234' && three.courses[0].startWeek === 9);
+
+  check('重复教师不重复追加', store.normalizeState({
+    courses: [sameCourse('丁华'), sameCourse('丁华'), sameCourse('张英')]
+  }).courses[0].teacher === '丁华、张英');
+  check('已合并的教师串再归一化不变', store.normalizeState({
+    courses: [sameCourse('丁华、张英、李丙文')]
+  }).courses[0].teacher === '丁华、张英、李丙文');
+  check('多教师合并后归一化幂等', JSON.stringify(store.normalizeState(three)) === JSON.stringify(three));
+
+  // 只有教师这一项不同才合并——其余字段任一不同都属独立安排
+  check('教室不同不合并', store.normalizeState({
+    courses: [sameCourse('丁华'), sameCourse('张英', { room: '敬仲楼115' })]
+  }).courses.length === 2);
+  check('节次不同不合并', store.normalizeState({
+    courses: [sameCourse('丁华'), sameCourse('张英', { startSection: 3, endSection: 4 })]
+  }).courses.length === 2);
+  check('星期不同不合并', store.normalizeState({
+    courses: [sameCourse('丁华'), sameCourse('张英', { weekday: 4 })]
+  }).courses.length === 2);
+  check('周次段不同不合并', store.normalizeState({
+    courses: [sameCourse('丁华'), sameCourse('张英', { startWeek: 1, endWeek: 8 })]
+  }).courses.length === 2);
+  check('单双周不同不合并', store.normalizeState({
+    courses: [sameCourse('丁华'), sameCourse('张英', { weekType: 'odd' })]
+  }).courses.length === 2);
+  check('课程名不同不合并', store.normalizeState({
+    courses: [sameCourse('丁华'), sameCourse('张英', { name: '思想道德与法治' })]
+  }).courses.length === 2);
+
+  check('空教师不写入名单', store.normalizeState({
+    courses: [sameCourse('丁华'), sameCourse('')]
+  }).courses[0].teacher === '丁华');
+
+  // 教师名单必须真正越过 40 字上限才能验证截断保护——10 个三字名只有 39 字，够不着
+  const longNames = Array.from({ length: 12 }, (_, i) => `教师${String(i).padStart(2, '0')}`);
+  check('构造的教师名单确实超过 40 字', longNames.join('、').length > 40, String(longNames.join('、').length));
+  const many = store.normalizeState({ courses: longNames.map((t) => sameCourse(t)) });
+  check('超长教师名单不超出 40 字上限', many.courses[0].teacher.length <= 40, String(many.courses[0].teacher.length));
+  check('超长名单仍是一门课', many.courses.length === 1);
+  check('超长名单归一化幂等', JSON.stringify(store.normalizeState(many)) === JSON.stringify(many));
+  check('截断处不留残缺人名', many.courses[0].teacher.split('、').every((n) => longNames.includes(n)), many.courses[0].teacher);
+
+  const payload = JSON.stringify({
+    format: 'syuct-timetable',
+    courses: [sameCourse('丁华'), sameCourse('张英')]
+  });
+  check('JSON 导入时即合并', store.parseImportText(payload).courses.length === 1);
+  check('mergeCourses 也收敛同课教师', store.mergeCourses(
+    [sameCourse('丁华')],
+    [sameCourse('张英'), sameCourse('李丙文')]
+  ).length === 1);
+  const viaMerge = store.mergeCourses([sameCourse('丁华')], [sameCourse('张英')]);
+  check('合并导入后教师并入', viaMerge[0].teacher === '丁华、张英', viaMerge[0].teacher);
 });
 
 safely('5. 文档页分享路径', () => {
@@ -388,6 +458,86 @@ safely('5. 文档页分享路径', () => {
   const functional = Object.assign({}, withShare({ shareApp: (page) => ({ title: `动态-${page.route}` }) }));
   functional.route = 'pages/map/map';
   check('函数形式可读取页面实例', functional.onShareAppMessage().title === '动态-pages/map/map');
+});
+
+// -------------------------------------------------------------- 周视图网格布局
+
+safely('6. 周视图网格布局', () => {
+  const sched = freshModule('utils/timetable-schedule.js');
+  const { buildGrid, GRID_ROW_HEIGHT, shortRoom } = sched;
+
+  const course = (over) => Object.assign({
+    id: 'x', name: '课', teacher: 'T', room: 'R',
+    weekday: 1, startSection: 1, endSection: 2,
+    startWeek: 1, endWeek: 16, weekType: 'all', colorIndex: 0
+  }, over);
+
+  // 行数：至少 10 节，有 11-12 节课时扩展，但不超过 12
+  check('默认渲染 10 个节次行', buildGrid([course({})], 1).rows.length === 10, String(buildGrid([course({})], 1).rows.length));
+  check('出现第 12 节时扩展到 12 行', buildGrid([course({ startSection: 11, endSection: 12 })], 1).rows.length === 12);
+  check('节次行带上下课时间', buildGrid([course({})], 1).rows[0].startLabel === '8:00');
+  check('第 11-12 节无时间表时标签为空', buildGrid([course({ startSection: 11, endSection: 12 })], 1).rows[10].startLabel === '');
+  check('空课表仍给 10 行骨架', buildGrid([], 1).rows.length === 10);
+  check('空课表无课块', buildGrid([], 1).blocks.length === 0);
+
+  // 跨节次高度
+  const single = buildGrid([course({ startSection: 3, endSection: 3 })], 1).blocks[0];
+  check('单节课高度为一行', single.height === GRID_ROW_HEIGHT, String(single.height));
+  const double = buildGrid([course({ startSection: 3, endSection: 4 })], 1).blocks[0];
+  check('两节连排高度为两行', double.height === GRID_ROW_HEIGHT * 2, String(double.height));
+  const quad = buildGrid([course({ startSection: 1, endSection: 4 })], 1).blocks[0];
+  check('四节连排高度为四行', quad.height === GRID_ROW_HEIGHT * 4, String(quad.height));
+  check('起始节次决定 top 偏移', double.top === GRID_ROW_HEIGHT * 2, String(double.top));
+  check('第一节课 top 为 0', buildGrid([course({ startSection: 1 })], 1).blocks[0].top === 0);
+
+  // 同一格多门课：叠成一格 + 角标，不并排挤压
+  const conflict = buildGrid([
+    course({ id: 'a', name: '单周课', weekType: 'odd' }),
+    course({ id: 'b', name: '双周课', weekType: 'even' })
+  ], 1);
+  check('同时段两门课只占一格', conflict.blocks.length === 1, String(conflict.blocks.length));
+  check('角标显示总门数', conflict.blocks[0].overflow === 2, String(conflict.blocks[0].overflow));
+  check('详情能拿到两门课的 id', conflict.blocks[0].ids.length === 2);
+  check('第 1 周优先显示单周课', conflict.blocks[0].name === '单周课', conflict.blocks[0].name);
+  const conflict2 = buildGrid([
+    course({ id: 'a', name: '单周课', weekType: 'odd' }),
+    course({ id: 'b', name: '双周课', weekType: 'even' })
+  ], 2);
+  check('第 2 周优先显示双周课', conflict2.blocks[0].name === '双周课', conflict2.blocks[0].name);
+  check('单门课时不显示角标', buildGrid([course({})], 1).blocks[0].overflow === 0);
+
+  // 本周与非本周标记
+  check('本周上课标记 inWeek', buildGrid([course({ weekType: 'all' })], 1).blocks[0].inWeek === true);
+  check('双周课在第 1 周标记为非本周', buildGrid([course({ weekType: 'even' })], 1).blocks[0].inWeek === false);
+  check('超出起止周标记为非本周', buildGrid([course({ startWeek: 5, endWeek: 8 })], 1).blocks[0].inWeek === false);
+  check('起止周内标记为本周', buildGrid([course({ startWeek: 5, endWeek: 8 })], 6).blocks[0].inWeek === true);
+
+  // 不同天各自成块
+  const week = buildGrid([1, 2, 3, 4, 5, 6, 7].map((d) => course({ id: 'd' + d, weekday: d })), 1);
+  check('七天各自成块', week.blocks.length === 7, String(week.blocks.length));
+  check('周一 weekday 为 1', week.blocks.find((b) => b.weekday === 1) !== undefined);
+  check('周日 weekday 为 7', week.blocks.find((b) => b.weekday === 7) !== undefined);
+  check('同天不同节次分开成块', buildGrid([
+    course({ id: 'a', startSection: 1, endSection: 2 }),
+    course({ id: 'b', startSection: 3, endSection: 4 })
+  ], 1).blocks.length === 2);
+
+  // 教室简称：网格里只有 92rpx，要取门牌号
+  check('取出楼栋后的门牌号', shortRoom('应星楼(原6#教学楼)403') === '403', shortRoom('应星楼(原6#教学楼)403'));
+  check('全角括号教室取门牌号', shortRoom('致本楼C座（原6#实验楼）214') === '214', shortRoom('致本楼C座（原6#实验楼）214'));
+  check('括号结尾的场馆名', shortRoom('健身馆(2)') === '2', shortRoom('健身馆(2)'));
+  check('纯中文教室名取末尾几字', shortRoom('第一体育馆') === '第一体育馆'.slice(-4) || shortRoom('第一体育馆').length <= 4, shortRoom('第一体育馆'));
+  check('空教室名返回空串', shortRoom('') === '' && shortRoom(null) === '' && shortRoom(undefined) === '');
+
+  // 归一化后的课程能直接进网格（防止字段名漂移）
+  const normalized = store.normalizeState({
+    settings: { semester: 'x', firstWeekDate: '2026-08-31', totalWeeks: 20 },
+    courses: [{ name: '高等数学', weekday: 2, startSection: 3, endSection: 4, startWeek: 1, endWeek: 16, weekType: 'all' }]
+  });
+  const fromStore = buildGrid(normalized.courses, 1);
+  check('归一化后的课程可直接布局', fromStore.blocks.length === 1);
+  check('布局块带课程名', fromStore.blocks[0].name === '高等数学', fromStore.blocks[0].name);
+  check('布局块带 colorIndex', typeof fromStore.blocks[0].colorIndex === 'number');
 });
 
 // ------------------------------------------------------------------------ 汇总

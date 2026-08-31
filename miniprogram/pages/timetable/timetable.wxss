@@ -185,6 +185,23 @@
   white-space: nowrap;
 }
 
+.week-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  flex-shrink: 0;
+}
+
+/* 跳周视图的入口：视图切换，与添加/导入/分享那三个动作卡片区分开 */
+.grid-entry {
+  padding: 5rpx 16rpx;
+  border-radius: 999rpx;
+  background: rgba(7, 92, 168, 0.08);
+  color: var(--primary);
+  font-size: 20rpx;
+  font-weight: 600;
+}
+
 .local-badge {
   padding: 5rpx 12rpx;
   border-radius: 999rpx;

@@ -59,8 +59,8 @@ def check_documents() -> None:
     docs = run_node_json(
         "const d=require('./data/documents'); console.log(JSON.stringify(d.DOCUMENTS));"
     )
-    if len(docs) != 43:
-        fail(f'文档数量应为 43，实际 {len(docs)}')
+    if len(docs) != 44:
+        fail(f'文档数量应为 44，实际 {len(docs)}')
 
     ids = [item['id'] for item in docs]
     files = [item['file'] for item in docs]
@@ -127,7 +127,7 @@ def check_documents() -> None:
         if expected_id not in search_result.get(query, []):
             fail(f'搜索词“{query}”不能命中 {expected_id}')
 
-    ok('43 份资料 ID、路径唯一，关键标题与网页版 v1.29 基线对齐')
+    ok('44 份资料 ID、路径唯一，关键标题与网页版 v1.29 基线对齐')
     ok('业务页面不再重复维护 docs/... 文档元数据')
     ok('常用新旧名称和关键词搜索正常')
 
@@ -333,8 +333,8 @@ def check_web_content_sync() -> None:
         fail('首页“新生最常问”未与网页版五项入口对齐')
 
     stats = {item.get('label'): item.get('value') for item in content.get('STATS', [])}
-    if stats.get('核心资料与地图') != '45 项':
-        fail('首页核心资料与地图统计未同步为 45 项')
+    if stats.get('核心资料与地图') != '46 项':
+        fail('首页核心资料与地图统计未同步为 46 项')
     if stats.get('实用导航地图') != '4 张':
         fail('首页导航地图统计未同步为 4 张')
     if content.get('SITE', {}).get('siteUrl') != 'https://www.syuct.top/':

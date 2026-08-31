@@ -279,5 +279,12 @@ module.exports = {
     "sourceBytes": 259030,
     "packedBytes": 259030,
     "fileType": "pdf"
+  },
+  "esports-club-recruit-2026.doc": {
+    "root": "/packages/pdf-i",
+    "mode": "native-document",
+    "sourceBytes": 12800,
+    "packedBytes": 12800,
+    "fileType": "doc"
   }
 };

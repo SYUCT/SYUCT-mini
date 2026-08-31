@@ -111,6 +111,43 @@ function normalizeCourse(raw, index) {
   };
 }
 
+// 教务系统里一门课有多位任课教师时，网页版会按教师拆成多行，
+// 除 teacher / colorIndex 外字段完全相同。合并回一条，教师并列展示，
+// 否则课表会出现多个同名同时段的重复块，课程数也偏多。
+function coalesceKey(course) {
+  return [
+    course.name,
+    course.room,
+    course.weekday,
+    course.startSection,
+    course.endSection,
+    course.startWeek,
+    course.endWeek,
+    course.weekType
+  ].join('|').toLowerCase();
+}
+
+function coalesceTeachers(courses) {
+  const result = [];
+  const index = new Map();
+  courses.forEach((course) => {
+    const key = coalesceKey(course);
+    const existing = index.get(key);
+    if (!existing) {
+      index.set(key, course);
+      result.push(course);
+      return;
+    }
+    if (!course.teacher) return;
+    const names = existing.teacher ? existing.teacher.split('、') : [];
+    if (names.includes(course.teacher)) return;
+    // 只在合并结果不超出字段上限时追加，避免截断出残缺人名、破坏归一化幂等
+    const merged = names.concat([course.teacher]).join('、');
+    if (merged.length <= 40) existing.teacher = merged;
+  });
+  return result;
+}
+
 function normalizeState(raw) {
   const base = defaultState();
   if (!raw || typeof raw !== 'object') return base;
@@ -126,7 +163,7 @@ function normalizeState(raw) {
       firstWeekDate: safeDateText(firstWeekDate),
       totalWeeks: asInt(totalWeeks, 20, 1, 30)
     },
-    courses: courses.map(normalizeCourse).filter(Boolean),
+    courses: coalesceTeachers(courses.map(normalizeCourse).filter(Boolean)),
     updatedAt: asInt(raw.updatedAt, Date.now(), 0)
   };
 }
@@ -274,7 +311,8 @@ function mergeCourses(currentCourses, incomingCourses) {
     merged.push(course);
     seen.add(signature);
   });
-  return merged;
+  // 去重签名含 teacher，同课不同教师会各自入列，这里再收敛成一条
+  return coalesceTeachers(merged);
 }
 
 function createExportPayload(state) {

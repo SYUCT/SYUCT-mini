@@ -70,7 +70,7 @@ const STATS = [
   { value: '9 月 3 日', label: '2026 级新生报到' },
   { value: '9.5—9.18', label: '新生军训' },
   { value: '9 月 21 日', label: '新生开始上课' },
-  { value: '45 项', label: '核心资料与地图' },
+  { value: '46 项', label: '核心资料与地图' },
   { value: '4 张', label: '实用导航地图' },
   { value: '1170264357', label: '学生交流群' }
 ];

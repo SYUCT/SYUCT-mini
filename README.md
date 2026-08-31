@@ -12,14 +12,14 @@
 
 ## 关于本项目
 
-一站式校园信息汇总，由学生整理、为学生服务。小程序端**不依赖任何服务器**：43 份资料、校园地图和课表功能全部内置在包体内，课表数据只保存在本机，不经过任何后端。
+一站式校园信息汇总，由学生整理、为学生服务。小程序端**不依赖任何服务器**：44 份资料、校园地图和课表功能全部内置在包体内，课表数据只保存在本机，不经过任何后端。
 
 | | |
 |---|---|
 | 小程序版本 | `v1.4.5-mini` |
 | 同步的网页版版本 | `v1.29` |
 | 内容同步日期 | `2026-08-14` |
-| 资料数量 | 43 份（另有 1 份致谢文档）；40 份内置原生打开，4 份超 3 MiB 走网页版 |
+| 资料数量 | 44 份（另有 1 份致谢文档）；41 份内置原生打开，4 份超 3 MiB 走网页版 |
 | 网页版 | [www.syuct.top](https://www.syuct.top/) · 仓库 `SYUCT/SYUCT-web` |
 | 小程序仓库 | `SYUCT/SYUCT-mini` |
 
@@ -88,9 +88,9 @@ syuct-miniprogram/
 ## 校验
 
 ```bash
-node scripts/test-timetable.js    # 课表码、导入容错、双份存储、分享路径回归（85 项断言）
+node scripts/test-timetable.js    # 课表码、导入容错、双份存储、分享路径回归（139 项断言）
 python3 scripts/verify-sync.py     # 内容同步、分包与主包/总包体积
-python3 scripts/verify-pdfs.py     # 40 份文档端到端还原 + 3 MiB 路由一致性
+python3 scripts/verify-pdfs.py     # 41 份文档端到端还原 + 3 MiB 路由一致性
 python3 scripts/verify-require.py  # 静态相对 require 路径可解析
 ```
 
