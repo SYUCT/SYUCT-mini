@@ -1,5 +1,5 @@
 // data/content.js — 网页版同步的站点与非文档内容
-// 内容基线：SYUCT 网页版 v1.29。
+// 内容基线：SYUCT 网页版 v260901。
 // 文档标题、分类、文件路径及栏目分组统一维护在 data/documents.js。
 
 const COMMUNITY_GROUPS = [
@@ -23,10 +23,10 @@ const COMMUNITY_GROUPS = [
 
 const SITE = {
   version: 'v1.5.0-mini',
-  sourceVersion: 'v1.29',
-  sourceRevision: '20260814',
-  updatedAt: '2026-08-14',
-  updatedMonth: '2026-08',
+  sourceVersion: 'v260901',
+  sourceRevision: '20260901',
+  updatedAt: '2026-09-01',
+  updatedMonth: '2026-09',
   siteUrl: 'https://www.syuct.top/',
   officialUrl: 'https://www.syuct.edu.cn/',
   repoUrl: 'https://github.com/SYUCT/SYUCT-web',

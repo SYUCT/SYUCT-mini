@@ -127,7 +127,7 @@ def check_documents() -> None:
         if expected_id not in search_result.get(query, []):
             fail(f'搜索词“{query}”不能命中 {expected_id}')
 
-    ok('44 份资料 ID、路径唯一，关键标题与网页版 v1.29 基线对齐')
+    ok('44 份资料 ID、路径唯一，关键标题与网页版 v260901 基线对齐')
     ok('业务页面不再重复维护 docs/... 文档元数据')
     ok('常用新旧名称和关键词搜索正常')
 
@@ -137,13 +137,15 @@ def check_versions_and_config() -> None:
     site = run_node_json(
         "const d=require('./data/content'); console.log(JSON.stringify(d.SITE));"
     )
-    if site.get('sourceVersion') != 'v1.29':
-        fail('sourceVersion 应为 v1.29')
+    if site.get('sourceVersion') != 'v260901':
+        fail('sourceVersion 应为 v260901')
     release_version = str(site.get('version') or '')
     if not re.fullmatch(r'v\d+\.\d+\.\d+-mini', release_version):
         fail(f'小程序版本格式无效：{release_version or "<空>"}，应类似 v1.4.5-mini')
-    if site.get('sourceRevision') != '20260814' or site.get('updatedAt') != '2026-08-14':
-        fail('网页版同步修订日期应为 2026-08-14')
+    if (site.get('sourceRevision') != '20260901'
+            or site.get('updatedAt') != '2026-09-01'
+            or site.get('updatedMonth') != '2026-09'):
+        fail('网页版同步日期应为 2026-09-01，资料截止月份应为 2026-09')
 
     config = json.loads(PROJECT_ROOT.joinpath('project.config.json').read_text(encoding='utf-8'))
     root_value = str(config.get('miniprogramRoot') or '').replace('\\', '/').rstrip('/') + '/'
@@ -446,7 +448,7 @@ def check_web_content_sync() -> None:
     if 'ack-entry' not in about or 'openAcknowledgements' not in about or 'openDoc(doc.file, doc.title)' not in about_js:
         fail('关于页“共建”下方致谢名单入口未完整接入')
     ok('关于页“共建”下方已接入致谢名单微信原生预览')
-    ok('首页五项常问、六大栏目、资料说明和官方全景已按网页版 v1.29 基线对齐')
+    ok('首页五项常问、六大栏目、资料说明和官方全景已按网页版 v260901 基线对齐')
 
 
 def read_image_size(path: Path) -> tuple[int, int]:
@@ -511,7 +513,7 @@ def check_groups_and_maps() -> None:
     if 'copyCommunityGroup' not in index_wxml or 'copyCommunityGroup' not in about_wxml:
         fail('交流群复制事件未统一接入')
     if '查看加群二维码' in index_wxml or ROOT.joinpath('assets/qq-group.png').exists():
-        fail('v1.29 已取消二维码，但小程序仍保留旧二维码入口或资源')
+        fail('当前网页版基线已取消二维码，但小程序仍保留旧二维码入口或资源')
 
     app = json.loads(ROOT.joinpath('app.json').read_text(encoding='utf-8'))
     package_index = {item.get('root'): item for item in app.get('subPackages', []) or app.get('subpackages', [])}
@@ -581,7 +583,7 @@ def check_groups_and_maps() -> None:
     if '/packages/gallery/assets/' not in gallery_viewer or 'wx.previewImage' not in gallery_viewer:
         fail('高清校园相册查看器配置异常')
 
-    ok('新生群与贴吧群按 v1.29 统一维护，旧二维码已清理')
+    ok('新生群与贴吧群按 v260901 统一维护，旧二维码已清理')
     # 加群只保留“复制群号”：不允许快捷加群/一键加群按钮、QQ 网页加群链接与
     # “微信小程序无法直接唤起 QQ”类提示框。
     freshman_wxml = ROOT.joinpath('pages/freshman/freshman.wxml').read_text(encoding='utf-8')
