@@ -80,7 +80,7 @@
     <view class="empty-state" wx:else>
       <view class="empty-icon">📅</view>
       <view class="empty-title">这一天还没有课程</view>
-      <view class="empty-desc">可以自己添加、导入同学分享的课表码，也可以用手机截图识别生成课表码。</view>
+      <view class="empty-desc">可手动添加课程，或导入课表码。</view>
       <view class="empty-actions">
         <view class="empty-button primary" bindtap="openAddCourse">添加课程</view>
         <view class="empty-button" bindtap="onImport">导入课表</view>
@@ -89,11 +89,11 @@
   </view>
 
   <view class="data-note">
-    <view class="data-note-title">手机也能生成课表码</view>
-    <view class="data-note-text data-note-link" bindtap="copyTimetableConverterLink">用手机浏览器打开课表转换网页，上传教务处完整课表截图，核对识别结果后生成课表码，再回到小程序从剪贴板导入。点此复制课表转换链接 ›</view>
-    <view class="data-note-text data-note-text-gap">如使用电脑，可在教务处复制整张课表，进入同一网页后选择“网页粘贴”。</view>
-    <view class="data-note-text data-note-text-gap">本项目为公益站，没租用服务器，全程本地记忆，不用担心泄漏资料，采用四级封装存储，不强行清理微信数据不会重置，哪怕重置了再导入一次课表码就行。</view>
-    <view class="data-note-text data-note-text-gap data-note-link" bindtap="openCommunity">校园指南网页版的校园社区有少部分专业的 26 级课表码分享，可以先去看看有没有自己的 ›</view>
+    <view class="data-note-title">生成课表码</view>
+    <view class="data-note-text data-note-link" bindtap="copyTimetableConverterLink">手机：上传教务处完整课表截图，识别并核对后生成课表码。复制转换页链接 ›</view>
+    <view class="data-note-text data-note-text-gap">电脑：复制教务处整张课表，在转换页选择“网页粘贴”。</view>
+    <view class="data-note-text data-note-text-gap">生成后返回小程序，从剪贴板导入。</view>
+    <view class="data-note-text data-note-text-gap data-note-link" bindtap="openCommunity">查看 26 级课表码分享 ›</view>
   </view>
 
   <view class="modal-mask" wx:if="{{showCourseModal}}" bindtap="closeCourseModal">
