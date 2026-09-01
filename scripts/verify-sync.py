@@ -283,6 +283,14 @@ def check_timetable_feature() -> None:
     for token in ('添加课程', '导入课表', '分享课表', '仅存本机'):
         if token not in page_wxml:
             fail(f'课表页面缺少关键入口：{token}')
+    if '电脑端校园指南' in page_wxml or '受限手机系统' in page_wxml:
+        fail('课表页面仍保留必须使用电脑端的过时引导')
+    for token in ('手机也能生成课表码', '上传教务处完整课表截图', 'copyTimetableConverterLink'):
+        source = page_wxml if token != 'copyTimetableConverterLink' else page_js
+        if token not in source:
+            fail(f'课表页面缺少手机截图识别引导：{token}')
+    if "`${SITE.siteUrl}timetable-converter.html`" not in page_js:
+        fail('课表页没有直接复制网页版课表转换链接')
     if '关于与共建' not in ROOT.joinpath('pages/index/index.wxml').read_text(encoding='utf-8'):
         fail('关于页移出 Tab 后，首页没有保留入口')
     ok('课表保持 5 项底栏结构，本地双份存储 + 5 次历史备份已接入')

@@ -448,19 +448,19 @@ Page(Object.assign({
 
   onImport() {
     wx.showActionSheet({
-      itemList: ['复制校园指南链接', '从剪贴板导入课表码 （强烈推荐）', '从微信聊天选择 JSON 文件'],
+      itemList: ['复制课表转换链接（手机可用）', '从剪贴板导入课表码（推荐）', '从微信聊天选择 JSON 文件'],
       success: (res) => {
-        if (res.tapIndex === 0) this.copyCampusGuideLink();
+        if (res.tapIndex === 0) this.copyTimetableConverterLink();
         if (res.tapIndex === 1) this.importFromClipboard();
         if (res.tapIndex === 2) this.importFromMessage();
       }
     });
   },
 
-  copyCampusGuideLink() {
+  copyTimetableConverterLink() {
     wx.setClipboardData({
-      data: 'https://syuct.top/',
-      success: () => wx.showToast({ title: '校园指南链接已复制', icon: 'success' }),
+      data: `${SITE.siteUrl}timetable-converter.html`,
+      success: () => wx.showToast({ title: '课表链接已复制', icon: 'success' }),
       fail: () => wx.showToast({ title: '复制失败，请稍后重试', icon: 'none' })
     });
   },

@@ -439,7 +439,7 @@
   margin-top: 7rpx;
 }
 
-/* 这行是跳网页版社区的入口，用主色区分于周围的说明文字 */
+/* 网页版入口用主色区分于周围的说明文字 */
 .data-note-link {
   color: var(--primary);
   font-weight: 600;

@@ -80,7 +80,7 @@
     <view class="empty-state" wx:else>
       <view class="empty-icon">📅</view>
       <view class="empty-title">这一天还没有课程</view>
-      <view class="empty-desc">可以自己添加，也可以导入同学分享的 SYUCT 课表码 / JSON。</view>
+      <view class="empty-desc">可以自己添加、导入同学分享的课表码，也可以用手机截图识别生成课表码。</view>
       <view class="empty-actions">
         <view class="empty-button primary" bindtap="openAddCourse">添加课程</view>
         <view class="empty-button" bindtap="onImport">导入课表</view>
@@ -89,8 +89,9 @@
   </view>
 
   <view class="data-note">
-    <view class="data-note-title">首次使用课表指南</view>
-    <view class="data-note-text">受限手机系统，课表会被截断。首次请打开电脑端校园指南网页，搭配教务处生成课表码，一次生成，半年够用。（或许你可以让班委宝宝生成，把课表码发班级群你直接用就行）</view>
+    <view class="data-note-title">手机也能生成课表码</view>
+    <view class="data-note-text data-note-link" bindtap="copyTimetableConverterLink">用手机浏览器打开课表转换网页，上传教务处完整课表截图，核对识别结果后生成课表码，再回到小程序从剪贴板导入。点此复制课表转换链接 ›</view>
+    <view class="data-note-text data-note-text-gap">如使用电脑，可在教务处复制整张课表，进入同一网页后选择“网页粘贴”。</view>
     <view class="data-note-text data-note-text-gap">本项目为公益站，没租用服务器，全程本地记忆，不用担心泄漏资料，采用四级封装存储，不强行清理微信数据不会重置，哪怕重置了再导入一次课表码就行。</view>
     <view class="data-note-text data-note-text-gap data-note-link" bindtap="openCommunity">校园指南网页版的校园社区有少部分专业的 26 级课表码分享，可以先去看看有没有自己的 ›</view>
   </view>
