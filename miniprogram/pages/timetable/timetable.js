@@ -448,7 +448,7 @@ Page(Object.assign({
 
   onImport() {
     wx.showActionSheet({
-      itemList: ['复制课表转换链接（手机可用）', '从剪贴板导入课表码（推荐）', '从微信聊天选择 JSON 文件'],
+      itemList: ['复制课表转换链接（首次使用）', '从剪贴板导入课表码（推荐）', '从微信聊天选择 JSON 文件'],
       success: (res) => {
         if (res.tapIndex === 0) this.copyTimetableConverterLink();
         if (res.tapIndex === 1) this.importFromClipboard();
