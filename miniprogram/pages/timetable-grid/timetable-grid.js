@@ -75,6 +75,20 @@ Page(Object.assign({
     const inWeek = state.courses.filter((course) => courseRunsInWeek(course, selectedWeek));
     const visible = showOtherWeeks ? state.courses : inWeek;
     const grid = buildGrid(visible, selectedWeek);
+    const courseById = new Map(state.courses.map((course) => [course.id, course]));
+    const blocks = grid.blocks.map((block) => {
+      const primary = courseById.get(block.ids[0]);
+      return {
+        ...block,
+        isCurrent: Boolean(primary && courseIsCurrent(
+          primary,
+          selectedWeek,
+          primary.weekday,
+          state.settings,
+          referenceDate
+        ))
+      };
+    });
 
     const weekdays = WEEKDAY_OPTIONS.map((label, index) => {
       let dateLabel = '';
@@ -90,7 +104,7 @@ Page(Object.assign({
 
     this.setData({
       rows: grid.rows,
-      blocks: grid.blocks,
+      blocks,
       weekdays,
       gridHeight: grid.maxSection * GRID_ROW_HEIGHT,
       weekCourseCount: inWeek.length,

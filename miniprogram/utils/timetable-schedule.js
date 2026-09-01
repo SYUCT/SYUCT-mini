@@ -108,16 +108,46 @@ function formatSectionTime(startSection, endSection) {
   return `${start.start} - ${end.end}`;
 }
 
-// 教室名普遍是「应星楼(原6#教学楼)403」这种，网格里只有 92rpx 宽，
-// 取末尾门牌号显示，完整名称留给详情弹窗。
-function shortRoom(room) {
+// 教室名普遍是「应星楼(原6#教学楼)403」这种。全览网格空间有限，
+// 去掉括号内的旧楼名与“楼/座”等冗余字，但保留新楼名和门牌号。
+function summarizeRoom(room) {
   const text = String(room || '').trim();
-  if (!text) return '';
-  const tail = /([0-9A-Za-z][0-9A-Za-z-]*)\s*$/.exec(text);
-  if (tail) return tail[1];
-  const paren = /（([^（）]*)）\s*$|\(([^()]*)\)\s*$/.exec(text);
-  if (paren) return paren[1] || paren[2] || '';
-  return Array.from(text).slice(-4).join('');
+  if (!text) return { label: '', building: '', number: '' };
+
+  const clean = text
+    .replace(/[（(]\s*原[^）)]*[）)]/g, '')
+    .replace(/\s+/g, '');
+
+  let building = '';
+  let number = '';
+  const tail = /([A-Za-z]?\d+[A-Za-z0-9-]*)$/.exec(clean);
+
+  if (tail) {
+    number = tail[1];
+    building = clean.slice(0, tail.index);
+  } else {
+    const paren = /^(.*?)[（(]([^（）()]+)[）)]$/.exec(clean);
+    if (paren) {
+      building = paren[1];
+      number = paren[2];
+    } else {
+      return { label: clean, building: clean, number: '' };
+    }
+  }
+
+  building = building
+    .replace(/^原/, '')
+    .replace(/(?:教学楼|实验楼|实训楼)$/g, '')
+    .replace(/楼/g, '')
+    .replace(/座$/g, '')
+    .replace(/(?:中心|馆)$/g, '');
+
+  if (!building) return { label: number, building: '', number };
+  return { label: `${building}·${number}`, building, number };
+}
+
+function shortRoom(room) {
+  return summarizeRoom(room).label;
 }
 
 // 周视图网格布局常量。行高用 rpx，与 timetable-grid.wxss 的 .grid-section 对应。
@@ -163,13 +193,17 @@ function buildGrid(courses, week) {
     });
     const primary = sorted[0];
     const span = Math.max(1, primary.endSection - primary.startSection + 1);
+    const room = summarizeRoom(primary.room);
     blocks.push({
       key,
       ids: sorted.map((item) => item.id),
       weekday: primary.weekday,
       startSection: primary.startSection,
+      span,
       name: primary.name,
-      room: shortRoom(primary.room),
+      room: room.label,
+      roomBuilding: room.building,
+      roomNumber: room.number,
       colorIndex: primary.colorIndex,
       inWeek: courseRunsInWeek(primary, week),
       overflow: sorted.length > 1 ? sorted.length : 0,

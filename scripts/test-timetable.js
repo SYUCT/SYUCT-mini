@@ -483,8 +483,10 @@ safely('6. 周视图网格布局', () => {
   // 跨节次高度
   const single = buildGrid([course({ startSection: 3, endSection: 3 })], 1).blocks[0];
   check('单节课高度为一行', single.height === GRID_ROW_HEIGHT, String(single.height));
+  check('单节课标记跨度为 1', single.span === 1, String(single.span));
   const double = buildGrid([course({ startSection: 3, endSection: 4 })], 1).blocks[0];
   check('两节连排高度为两行', double.height === GRID_ROW_HEIGHT * 2, String(double.height));
+  check('两节连排标记跨度为 2', double.span === 2, String(double.span));
   const quad = buildGrid([course({ startSection: 1, endSection: 4 })], 1).blocks[0];
   check('四节连排高度为四行', quad.height === GRID_ROW_HEIGHT * 4, String(quad.height));
   check('起始节次决定 top 偏移', double.top === GRID_ROW_HEIGHT * 2, String(double.top));
@@ -522,12 +524,17 @@ safely('6. 周视图网格布局', () => {
     course({ id: 'b', startSection: 3, endSection: 4 })
   ], 1).blocks.length === 2);
 
-  // 教室简称：网格里只有 92rpx，要取门牌号
-  check('取出楼栋后的门牌号', shortRoom('应星楼(原6#教学楼)403') === '403', shortRoom('应星楼(原6#教学楼)403'));
-  check('全角括号教室取门牌号', shortRoom('致本楼C座（原6#实验楼）214') === '214', shortRoom('致本楼C座（原6#实验楼）214'));
-  check('括号结尾的场馆名', shortRoom('健身馆(2)') === '2', shortRoom('健身馆(2)'));
-  check('纯中文教室名取末尾几字', shortRoom('第一体育馆') === '第一体育馆'.slice(-4) || shortRoom('第一体育馆').length <= 4, shortRoom('第一体育馆'));
+  // 教室简称：去掉旧楼名与冗余后缀，但必须同时保留楼名和门牌号
+  check('保留新楼名与门牌号', shortRoom('应星楼(原6#教学楼)403') === '应星·403', shortRoom('应星楼(原6#教学楼)403'));
+  check('全角括号与分座正确压缩', shortRoom('致本楼C座（原6#实验楼）214') === '致本C·214', shortRoom('致本楼C座（原6#实验楼）214'));
+  check('旧楼名不会进入网格简称', shortRoom('通明楼(原5#教学楼)138') === '通明·138', shortRoom('通明楼(原5#教学楼)138'));
+  check('括号结尾的场馆编号', shortRoom('健身馆(2)') === '健身·2', shortRoom('健身馆(2)'));
+  check('纯中文教室名完整保留', shortRoom('第一体育馆') === '第一体育馆', shortRoom('第一体育馆'));
   check('空教室名返回空串', shortRoom('') === '' && shortRoom(null) === '' && shortRoom(undefined) === '');
+
+  const roomBlock = buildGrid([course({ room: '应星楼(原6#教学楼)403' })], 1).blocks[0];
+  check('网格块提供紧凑楼名', roomBlock.roomBuilding === '应星', roomBlock.roomBuilding);
+  check('网格块单独提供门牌号', roomBlock.roomNumber === '403', roomBlock.roomNumber);
 
   // 归一化后的课程能直接进网格（防止字段名漂移）
   const normalized = store.normalizeState({

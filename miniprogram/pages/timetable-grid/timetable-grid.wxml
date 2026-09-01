@@ -1,28 +1,56 @@
 <view class="page grid-page">
   <view class="grid-hero">
-    <view class="hero-row">
-      <view>
-        <view class="hero-kicker">{{state.settings.semester}}</view>
-        <view class="hero-title">第 {{selectedWeek}} 周课表全览</view>
-      </view>
-      <view class="hero-count">{{weekCourseCount}} 门</view>
-    </view>
-    <view class="week-controls">
-      <view class="week-button {{selectedWeek <= 1 ? 'is-disabled' : ''}}" bindtap="previousWeek">上一周</view>
-      <view class="week-current" bindtap="goCurrentWeek">回到本周</view>
-      <view class="week-button {{selectedWeek >= state.settings.totalWeeks ? 'is-disabled' : ''}}" bindtap="nextWeek">下一周</view>
-    </view>
-  </view>
+    <view class="hero-glow hero-glow-one"></view>
+    <view class="hero-glow hero-glow-two"></view>
 
-  <view class="toggle-bar" wx:if="{{hiddenCount}}">
-    <view class="toggle-copy">
-      <view class="toggle-title">显示非本周课程</view>
-      <view class="toggle-desc">另有 {{hiddenCount}} 门课本周不上（单双周或已结束）</view>
+    <view class="hero-row">
+      <view class="hero-copy">
+        <view class="hero-kicker">{{state.settings.semester}}</view>
+        <view class="hero-title">第 {{selectedWeek}} 周 · 课表全览</view>
+        <view class="hero-state" wx:if="{{selectedWeek == currentWeek}}">当前教学周</view>
+        <view class="hero-state" wx:else>当前为第 {{currentWeek}} 周</view>
+      </view>
+      <view class="hero-count">
+        <text class="hero-count-number">{{weekCourseCount}}</text>
+        <text class="hero-count-unit">门课</text>
+      </view>
     </view>
-    <switch checked="{{showOtherWeeks}}" bindchange="toggleOtherWeeks" color="#075ca8" />
+
+    <view class="week-controls">
+      <view
+        class="week-button {{selectedWeek <= 1 ? 'is-disabled' : ''}}"
+        bindtap="previousWeek"
+        hover-class="is-pressed"
+      >
+        <text class="week-arrow">‹</text>
+        <text>上一周</text>
+      </view>
+      <view class="week-current" bindtap="goCurrentWeek" hover-class="is-pressed">
+        {{selectedWeek == currentWeek ? '当前周' : '回到本周'}}
+      </view>
+      <view
+        class="week-button {{selectedWeek >= state.settings.totalWeeks ? 'is-disabled' : ''}}"
+        bindtap="nextWeek"
+        hover-class="is-pressed"
+      >
+        <text>下一周</text>
+        <text class="week-arrow">›</text>
+      </view>
+    </view>
   </view>
 
   <view class="grid-wrap">
+    <view class="grid-toolbar" wx:if="{{hiddenCount}}">
+      <view class="toolbar-copy">
+        <view class="toolbar-title">非本周课程</view>
+        <view class="toolbar-desc">{{hiddenCount}} 门本周暂不上</view>
+      </view>
+      <view class="toolbar-control">
+        <text>{{showOtherWeeks ? '已显示' : '已隐藏'}}</text>
+        <switch class="toolbar-switch" checked="{{showOtherWeeks}}" bindchange="toggleOtherWeeks" color="#075ca8" />
+      </view>
+    </view>
+
     <view class="grid-head">
       <view class="grid-corner">节次</view>
       <view class="grid-day {{item.isToday ? 'is-today' : ''}}" wx:for="{{weekdays}}" wx:key="weekday">
@@ -31,7 +59,7 @@
       </view>
     </view>
 
-    <view class="grid-body" style="height: {{gridHeight}}rpx;">
+    <view class="grid-body" wx:if="{{blocks.length}}" style="height: {{gridHeight}}rpx;">
       <view class="grid-sections">
         <view class="grid-section" wx:for="{{rows}}" wx:key="section" style="height: {{rowHeight}}rpx;">
           <view class="grid-section-num">{{item.section}}</view>
@@ -42,54 +70,92 @@
 
       <view class="grid-canvas">
         <view class="grid-line" wx:for="{{rows}}" wx:key="section" style="top: {{index * rowHeight}}rpx; height: {{rowHeight}}rpx;"></view>
-        <view class="grid-col" wx:for="{{weekdays}}" wx:key="weekday" style="left: {{index * 14.285}}%;"></view>
+        <view class="grid-col {{item.isToday ? 'is-today' : ''}}" wx:for="{{weekdays}}" wx:key="weekday" style="left: {{index * 14.285}}%;"></view>
 
         <view
-          class="grid-block tone-{{item.colorIndex}} {{item.inWeek ? '' : 'is-outside'}}"
+          class="grid-block tone-{{item.colorIndex}} {{item.span == 1 ? 'is-single' : ''}} {{item.inWeek ? '' : 'is-outside'}} {{item.isCurrent ? 'is-current' : ''}}"
           wx:for="{{blocks}}"
           wx:key="key"
           style="top: {{item.top}}rpx; height: {{item.height}}rpx; left: {{(item.weekday - 1) * 14.285}}%;"
           bindtap="openDetail"
+          hover-class="is-pressed"
           data-key="{{item.key}}"
         >
-          <view class="block-inner">
+          <view class="block-inner {{item.overflow ? 'has-badge' : ''}}">
             <view class="block-badge" wx:if="{{item.overflow}}">{{item.overflow}}</view>
-            <view class="block-tag" wx:if="{{!item.inWeek}}">非本周</view>
+            <view class="block-state" wx:if="{{item.isCurrent}}">上课中</view>
+            <view class="block-tag" wx:elif="{{!item.inWeek}}">非本周</view>
             <view class="block-name">{{item.name}}</view>
-            <view class="block-room" wx:if="{{item.room}}">{{item.room}}</view>
+            <view class="block-room" wx:if="{{item.room}}">
+              <text class="block-building" wx:if="{{item.roomBuilding}}">{{item.roomBuilding}}</text>
+              <text class="block-room-divider" wx:if="{{item.roomBuilding && item.roomNumber}}">·</text>
+              <text class="block-room-number" wx:if="{{item.roomNumber}}">{{item.roomNumber}}</text>
+              <text class="block-room-label" wx:if="{{!item.roomBuilding && !item.roomNumber}}">{{item.room}}</text>
+            </view>
           </view>
         </view>
       </view>
     </view>
+
+    <view class="grid-empty" wx:else>
+      <view class="empty-badge">第 {{selectedWeek}} 周</view>
+      <view class="empty-title">暂无课程</view>
+      <view class="empty-desc" wx:if="{{hiddenCount}}">打开上方开关可查看非本周课程</view>
+      <view class="empty-desc" wx:else>请返回课表页添加或导入课程</view>
+    </view>
   </view>
 
-  <view class="empty-hint" wx:if="{{!blocks.length}}">
-    <view class="empty-icon">🗓️</view>
-    <view class="empty-title">第 {{selectedWeek}} 周没有课程</view>
-    <view class="empty-desc" wx:if="{{hiddenCount}}">打开上方开关可以看到本周不上的 {{hiddenCount}} 门课。</view>
-    <view class="empty-desc" wx:else>回到课表页添加课程或导入课表码。</view>
+  <view class="page-footer" wx:if="{{blocks.length}}">
+    <view class="footer-dot"></view>
+    <text>点击课程查看完整教室、教师与周次</text>
   </view>
-
-  <view class="page-footer">点击任意课程可以查看教师、完整教室与周次</view>
 
   <view class="modal-mask" wx:if="{{detail}}" bindtap="closeDetail">
     <view class="detail-modal" catchtap="preventBubble">
+      <view class="detail-handle"></view>
       <view class="detail-head">
-        <view class="detail-head-title">课程详情</view>
-        <view class="detail-close" bindtap="closeDetail">关闭</view>
+        <view>
+          <view class="detail-head-title">课程详情</view>
+          <view class="detail-head-sub" wx:if="{{detail.courses.length > 1}}">该时段共有 {{detail.courses.length}} 门课程</view>
+          <view class="detail-head-sub" wx:else>完整课程信息</view>
+        </view>
+        <view class="detail-close" bindtap="closeDetail" hover-class="is-pressed">×</view>
       </view>
+
       <scroll-view class="detail-scroll" scroll-y="true">
-        <view class="detail-card {{item.inWeek ? '' : 'is-outside'}}" wx:for="{{detail.courses}}" wx:key="id">
-          <view class="detail-name">
-            <text>{{item.name}}</text>
-            <text class="detail-current" wx:if="{{item.isCurrent}}">当前</text>
-            <text class="detail-outside" wx:if="{{!item.inWeek}}">本周不上</text>
+        <view class="detail-card tone-{{item.colorIndex}} {{item.inWeek ? '' : 'is-outside'}}" wx:for="{{detail.courses}}" wx:key="id">
+          <view class="detail-accent"></view>
+          <view class="detail-title-row">
+            <view class="detail-name">{{item.name}}</view>
+            <view class="detail-tags">
+              <text class="detail-current" wx:if="{{item.isCurrent}}">上课中</text>
+              <text class="detail-outside" wx:if="{{!item.inWeek}}">本周不上</text>
+            </view>
           </view>
-          <view class="detail-line">{{item.weekdayLabel}} · {{item.sectionLabel}}<text wx:if="{{item.timeLabel}}"> · {{item.timeLabel}}</text></view>
-          <view class="detail-line" wx:if="{{item.teacher}}">教师：{{item.teacher}}</view>
-          <view class="detail-line" wx:if="{{item.room}}">教室：{{item.room}}</view>
-          <view class="detail-line">周次：{{item.weekLabel}}</view>
-          <view class="detail-edit" bindtap="editCourse" data-id="{{item.id}}">去课表页编辑</view>
+
+          <view class="detail-schedule">
+            {{item.weekdayLabel}} · {{item.sectionLabel}}<text wx:if="{{item.timeLabel}}"> · {{item.timeLabel}}</text>
+          </view>
+
+          <view class="detail-meta-grid">
+            <view class="detail-meta" wx:if="{{item.teacher}}">
+              <view class="detail-meta-label">教师</view>
+              <view class="detail-meta-value">{{item.teacher}}</view>
+            </view>
+            <view class="detail-meta">
+              <view class="detail-meta-label">周次</view>
+              <view class="detail-meta-value">{{item.weekLabel}}</view>
+            </view>
+            <view class="detail-meta is-wide" wx:if="{{item.room}}">
+              <view class="detail-meta-label">教室</view>
+              <view class="detail-meta-value">{{item.room}}</view>
+            </view>
+          </view>
+
+          <view class="detail-edit" bindtap="editCourse" hover-class="is-pressed" data-id="{{item.id}}">
+            <text>编辑这门课程</text>
+            <text class="detail-edit-arrow">›</text>
+          </view>
         </view>
       </scroll-view>
     </view>
