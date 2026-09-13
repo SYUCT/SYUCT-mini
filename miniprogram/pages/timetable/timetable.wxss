@@ -652,3 +652,21 @@
 .data-note-text-gap {
   margin-top: 12rpx;
 }
+
+.data-note-download {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 18rpx 0 12rpx;
+  padding: 18rpx 22rpx;
+  min-height: 88rpx;
+  box-sizing: border-box;
+  border-radius: 14rpx;
+  color: #fff;
+  background: var(--primary);
+  font-size: 27rpx;
+  font-weight: 600;
+  line-height: 1.6;
+  text-align: center;
+}
+.data-note-download::after { border: none; }

@@ -89,11 +89,18 @@
   </view>
 
   <view class="data-note">
-    <view class="data-note-title">在网页中生成课表码</view>
-    <view class="data-note-text">手机：上传教务处完整课表截图，识别并核对后生成课表码。</view>
-    <view class="data-note-text data-note-link" bindtap="copyTimetableConverterLink">复制课表转换链接 ›</view>
-    <view class="data-note-text data-note-text-gap">电脑：复制教务处整张课表，在转换网页中选择“网页粘贴”。</view>
-    <view class="data-note-text data-note-text-gap">生成后返回小程序，从剪贴板导入。</view>
+    <view class="data-note-title">化大课表 App（仅限安卓）</view>
+    <view class="data-note-text">读取教务课表后导出课表码，返回小程序导入。</view>
+    <button class="data-note-download" bindtap="copyTimetableAppLink">复制 App 下载链接 ›</button>
+    <view class="data-note-text">复制后在手机浏览器打开。</view>
+  </view>
+
+  <view class="data-note">
+    <view class="data-note-title">网页中获取课表码或 App 生成课表码</view>
+    <view class="data-note-text">本科：复制教务处课表，在网页中粘贴。</view>
+    <view class="data-note-text">硕士：在网页中上传教务处课表 PDF。</view>
+    <view class="data-note-text data-note-text-gap data-note-link" bindtap="copyTimetableConverterLink">复制转换网页链接 ›</view>
+    <view class="data-note-text data-note-text-gap">核对并生成课表码后，返回小程序从剪贴板导入。</view>
     <view class="data-note-text data-note-text-gap data-note-link" bindtap="openCommunity">查看部分专业的 26 级课表码分享 ›</view>
   </view>
 

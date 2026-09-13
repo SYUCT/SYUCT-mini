@@ -457,10 +457,18 @@ Page(Object.assign({
     });
   },
 
+  copyTimetableAppLink() {
+    wx.setClipboardData({
+      data: `${SITE.siteUrl}downloads/SYUCT-Timetable.apk`,
+      success: () => wx.showToast({ title: '下载链接已复制，请在浏览器打开', icon: 'none', duration: 2200 }),
+      fail: () => wx.showToast({ title: '复制失败，请稍后重试', icon: 'none' })
+    });
+  },
+
   copyTimetableConverterLink() {
     wx.setClipboardData({
       data: `${SITE.siteUrl}timetable-converter.html`,
-      success: () => wx.showToast({ title: '课表链接已复制', icon: 'success' }),
+      success: () => wx.showToast({ title: '链接已复制，请在浏览器打开', icon: 'none', duration: 2200 }),
       fail: () => wx.showToast({ title: '复制失败，请稍后重试', icon: 'none' })
     });
   },

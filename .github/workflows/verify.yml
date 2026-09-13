@@ -16,7 +16,9 @@ jobs:
         run: find miniprogram scripts -name '*.js' -print0 | xargs -0 -n1 node --check
 
       - name: 课表与分享回归测试
-        run: node scripts/test-timetable.js
+        run: |
+          node scripts/test-timetable.js
+          node scripts/test-app-link.js
 
       - name: 安装校验依赖
         run: |

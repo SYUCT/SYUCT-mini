@@ -287,10 +287,14 @@ def check_timetable_feature() -> None:
             fail(f'课表页面缺少关键入口：{token}')
     if '电脑端校园指南' in page_wxml or '受限手机系统' in page_wxml:
         fail('课表页面仍保留必须使用电脑端的过时引导')
-    for token in ('在网页中生成课表码', '手机：上传教务处完整课表截图', '电脑：复制教务处整张课表', '生成后返回小程序，从剪贴板导入', 'copyTimetableConverterLink'):
+    for token in ('网页中获取课表码或 App 生成课表码', '本科：复制教务处课表，在网页中粘贴', '硕士：在网页中上传教务处课表 PDF', '核对并生成课表码后，返回小程序从剪贴板导入', 'copyTimetableConverterLink'):
         source = page_wxml if token != 'copyTimetableConverterLink' else page_js
         if token not in source:
-            fail(f'课表页面缺少手机截图识别引导：{token}')
+            fail(f'课表页面缺少本科/硕士网页导入引导：{token}')
+    if '手机：上传教务处完整课表截图' in page_wxml or '电脑：复制教务处整张课表' in page_wxml:
+        fail('课表页面仍保留按设备区分的过时引导')
+    if '链接已复制，请在浏览器打开' not in page_js:
+        fail('复制转换链接后未提示在浏览器打开')
     if "`${SITE.siteUrl}timetable-converter.html`" not in page_js:
         fail('课表页没有直接复制网页版课表转换链接')
     if '关于与共建' not in ROOT.joinpath('pages/index/index.wxml').read_text(encoding='utf-8'):
