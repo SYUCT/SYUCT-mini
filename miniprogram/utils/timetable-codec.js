@@ -1,4 +1,5 @@
 const PREFIX = 'SYUCT-TT2:';
+const BACKUP_PREFIX = 'SYUCT-APP3:';
 const MAX_CODE_LENGTH = 200000;
 const MAX_COURSES = 200;
 
@@ -72,7 +73,17 @@ function validateDecodedCourse(course) {
 
 function encodeShareCode(payload) {
   const settings = payload && payload.settings ? payload.settings : {};
-  const courses = payload && Array.isArray(payload.courses) ? payload.courses : [];
+  const input = payload && Array.isArray(payload.courses) ? payload.courses : [];
+  const courses = [];
+  input.forEach((course) => {
+    if (course.weekType !== 'custom') { courses.push(course); return; }
+    const weeks = require('./timetable-calendar').normalizeWeeks(course.weeks);
+    let previous = null;
+    weeks.forEach((week) => {
+      if (previous && previous.endWeek + 1 === week) previous.endWeek = week;
+      else { previous = { ...course, startWeek: week, endWeek: week, weekType: 'all' }; courses.push(previous); }
+    });
+  });
   if (courses.length > MAX_COURSES) throw new Error('课程数量过多，无法生成课表码');
 
   let body = '';
@@ -194,9 +205,34 @@ function isShareCode(text) {
   return String(text == null ? '' : text).indexOf(PREFIX) >= 0;
 }
 
+function encodeFullBackup(state) {
+  const body = JSON.stringify(state);
+  if (!body || body.length > MAX_CODE_LENGTH) throw new Error('完整备份过长');
+  return `${BACKUP_PREFIX}${checksum(body)}:${body}`;
+}
+
+function isFullBackup(text) {
+  return String(text || '').replace(/^\uFEFF/, '').trim().startsWith(BACKUP_PREFIX);
+}
+
+function decodeFullBackup(text) {
+  const source = String(text || '').replace(/^\uFEFF/, '').trim();
+  if (!isFullBackup(source) || source.length > MAX_CODE_LENGTH + 22) throw new Error('不是有效的完整备份');
+  const rest = source.slice(BACKUP_PREFIX.length), body = rest.slice(9);
+  if (!/^[0-9a-f]{8}:/.test(rest) || checksum(body) !== rest.slice(0, 8)) throw new Error('完整备份不完整或已被修改');
+  let value;
+  try { value = JSON.parse(body); } catch (e) { throw new Error('完整备份数据损坏'); }
+  if (!value || !Array.isArray(value.courses)) throw new Error('完整备份数据无效');
+  return value;
+}
+
 module.exports = {
   PREFIX,
   encodeShareCode,
   decodeShareCode,
-  isShareCode
+  isShareCode,
+  BACKUP_PREFIX,
+  encodeFullBackup,
+  decodeFullBackup,
+  isFullBackup
 };

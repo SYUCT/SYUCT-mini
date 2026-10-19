@@ -1,0 +1,40 @@
+<template name="adjustment-editor">
+  <view class="calendar-mask" wx:if="{{showAdjustmentModal}}" bindtap="closeAdjustment">
+    <view class="calendar-modal" catchtap="preventBubble">
+      <view class="calendar-heading"><view class="calendar-title">按日期调课</view><view class="calendar-close" bindtap="closeAdjustment">关闭</view></view>
+      <scroll-view class="calendar-scroll" scroll-y="true">
+        <view class="calendar-label">原上课日期</view>
+        <picker mode="date" value="{{adjustmentForm.sourceDate}}" start="{{adjustmentMinDate}}" end="{{adjustmentMaxDate}}" bindchange="onAdjustmentSourceChange"><view class="calendar-picker">{{adjustmentForm.sourceDate || '选择原日期'}}</view></picker>
+        <view class="calendar-label">调到哪一天</view>
+        <picker mode="date" value="{{adjustmentForm.targetDate}}" start="{{adjustmentMinDate}}" end="{{adjustmentMaxDate}}" bindchange="onAdjustmentTargetChange"><view class="calendar-picker">{{adjustmentForm.targetDate || '选择目标日期'}}</view></picker>
+        <view class="calendar-switch-row"><view><view class="calendar-label">原日期停课</view><view class="calendar-help">关闭后，原日期仍照常上课</view></view><switch checked="{{adjustmentForm.suspendSource}}" color="#075ca8" bindchange="onAdjustmentSuspendChange" /></view>
+        <view class="calendar-notice">{{adjustmentPreview}}</view>
+        <view class="calendar-primary" bindtap="saveAdjustment">保存调课</view>
+        <view class="calendar-danger" wx:if="{{adjustmentForm.index >= 0}}" bindtap="removeAdjustment">取消这次调课</view>
+        <view class="calendar-label" wx:if="{{adjustmentRecords.length}}">已保存的调课 · {{adjustmentRecords.length}} 条</view>
+        <view class="calendar-record" wx:for="{{adjustmentRecords}}" wx:key="targetDate" data-index="{{item.index}}" bindtap="openAdjustmentRecord"><view>{{item.sourceDate}} → {{item.targetDate}}</view><view class="calendar-help">{{item.suspendSource ? '原日期停课' : '原日期照常上课'}} · 点击修改或取消</view></view>
+      </scroll-view>
+    </view>
+  </view>
+</template>
+
+<template name="course-detail">
+  <view class="calendar-mask" wx:if="{{detail}}" bindtap="closeDetail">
+    <view class="calendar-modal" catchtap="preventBubble">
+      <view class="calendar-heading"><view class="calendar-title">课程详情</view><view class="calendar-close" bindtap="closeDetail">关闭</view></view>
+      <scroll-view class="calendar-scroll" scroll-y="true">
+        <view class="calendar-detail tone-{{item.colorIndex}}" wx:for="{{detail.courses}}" wx:key="id">
+          <view class="calendar-course-name">{{item.name}}</view>
+          <view class="calendar-tags"><text wx:if="{{item.isCurrent}}">正在上课</text><text wx:if="{{!item.inWeek}}">非本周</text><text wx:if="{{item.adjusted}}">调课 · 来自 {{item.sourceDate}}</text></view>
+          <view class="calendar-meta"><text class="calendar-meta-label">开课时间</text><text>{{item.weekLabel}}</text></view>
+          <view class="calendar-meta"><text class="calendar-meta-label">上课节次</text><text>{{item.weekdayLabel}} {{item.sectionLabel}}</text></view>
+          <view class="calendar-meta" wx:if="{{item.timeLabel}}"><text class="calendar-meta-label">上课时间</text><text>{{item.timeLabel}}</text></view>
+          <view class="calendar-meta"><text class="calendar-meta-label">授课教师</text><text>{{item.teacher || '未填写'}}</text></view>
+          <view class="calendar-meta"><text class="calendar-meta-label">课程地点</text><text>{{item.room || '未填写'}}</text></view>
+          <view class="calendar-help" wx:if="{{item.adjusted}}">修改会更新这门课的常规安排。仅撤销本次调课，请点星期栏。</view>
+          <view class="calendar-primary" bindtap="editCourse" data-id="{{item.id}}">修改课程</view>
+        </view>
+      </scroll-view>
+    </view>
+  </view>
+</template>

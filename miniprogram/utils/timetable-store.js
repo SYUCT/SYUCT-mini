@@ -1,4 +1,5 @@
 const codec = require('./timetable-codec');
+const calendar = require('./timetable-calendar');
 const MAIN_KEY = 'syuct_timetable_v1';
 const HISTORY_KEY = 'syuct_timetable_history_v1';
 const TITLE_NAME_KEY = 'syuct_timetable_title_name_v1';
@@ -17,9 +18,11 @@ function defaultState() {
     settings: {
       semester: '2026-2027-1',
       firstWeekDate: '',
-      totalWeeks: 20
+      totalWeeks: 20,
+      periodTimes: calendar.validateTimes()
     },
     courses: [],
+    adjustments: [],
     updatedAt: Date.now()
   };
 }
@@ -95,7 +98,9 @@ function normalizeCourse(raw, index) {
     endWeek = temp;
   }
 
-  const weekType = ['all', 'odd', 'even'].includes(raw.weekType) ? raw.weekType : 'all';
+  const weekType = ['all', 'odd', 'even', 'custom'].includes(raw.weekType) ? raw.weekType : 'all';
+  const weeks = weekType === 'custom' ? calendar.normalizeWeeks(raw.weeks) : null;
+  if (weeks) { startWeek = weeks[0]; endWeek = weeks[weeks.length - 1]; }
   return {
     id: safeText(raw.id, 80) || makeId(),
     name,
@@ -107,6 +112,7 @@ function normalizeCourse(raw, index) {
     startWeek,
     endWeek,
     weekType,
+    ...(weeks ? { weeks } : {}),
     colorIndex: asInt(raw.colorIndex, index || 0, 0, 5)
   };
 }
@@ -123,7 +129,8 @@ function coalesceKey(course) {
     course.endSection,
     course.startWeek,
     course.endWeek,
-    course.weekType
+    course.weekType,
+    (course.weeks || []).join(',')
   ].join('|').toLowerCase();
 }
 
@@ -156,14 +163,17 @@ function normalizeState(raw) {
   const semester = settings.semester != null ? settings.semester : raw.semester;
   const firstWeekDate = settings.firstWeekDate != null ? settings.firstWeekDate : raw.firstWeekDate;
   const totalWeeks = settings.totalWeeks != null ? settings.totalWeeks : raw.totalWeeks;
+  const normalizedSettings = {
+    semester: safeText(semester, 40) || base.settings.semester,
+    firstWeekDate: safeDateText(firstWeekDate),
+    totalWeeks: asInt(totalWeeks, 20, 1, 30),
+    periodTimes: calendar.validateTimes(settings.periodTimes)
+  };
   return {
     schemaVersion: 1,
-    settings: {
-      semester: safeText(semester, 40) || base.settings.semester,
-      firstWeekDate: safeDateText(firstWeekDate),
-      totalWeeks: asInt(totalWeeks, 20, 1, 30)
-    },
+    settings: normalizedSettings,
     courses: coalesceTeachers(courses.map(normalizeCourse).filter(Boolean)),
+    adjustments: calendar.validateAdjustments(raw.adjustments, normalizedSettings),
     updatedAt: asInt(raw.updatedAt, Date.now(), 0)
   };
 }
@@ -245,10 +255,10 @@ function getHistory() {
 function pushHistory(state) {
   const history = getHistory();
   const snapshot = normalizeState(state);
-  const signature = JSON.stringify({ settings: snapshot.settings, courses: snapshot.courses });
+  const signature = JSON.stringify({ settings: snapshot.settings, courses: snapshot.courses, adjustments: snapshot.adjustments });
   const first = history[0];
   if (first) {
-    const firstSignature = JSON.stringify({ settings: first.settings, courses: first.courses });
+    const firstSignature = JSON.stringify({ settings: first.settings, courses: first.courses, adjustments: first.adjustments });
     if (signature === firstSignature) return history.length;
   }
   history.unshift(snapshot);
@@ -261,6 +271,10 @@ function saveState(nextState, options) {
   const opts = options || {};
   const current = loadState();
   const next = normalizeState(nextState);
+  if (next.settings.firstWeekDate && new Date(calendar.dateDay(next.settings.firstWeekDate)).getUTCDay() !== 1) {
+    throw new Error('第一周日期必须为周一');
+  }
+  if (next.courses.some((c) => c.endWeek > next.settings.totalWeeks)) throw new Error('课程周次超过学期总周数，请先调整课程');
   next.updatedAt = Date.now();
   try {
     wx.setStorageSync(MAIN_KEY, next);
@@ -294,7 +308,8 @@ function courseSignature(course) {
     course.endSection,
     course.startWeek,
     course.endWeek,
-    course.weekType
+    course.weekType,
+    (course.weeks || []).join(',')
   ].join('|').toLowerCase();
 }
 
@@ -323,6 +338,7 @@ function createExportPayload(state) {
     exportedAt: new Date().toISOString(),
     semester: normalized.settings.semester,
     settings: normalized.settings,
+    adjustments: normalized.adjustments,
     courses: normalized.courses.map((course) => ({
       name: course.name,
       teacher: course.teacher,
@@ -333,6 +349,7 @@ function createExportPayload(state) {
       startWeek: course.startWeek,
       endWeek: course.endWeek,
       weekType: course.weekType,
+      ...(course.weekType === 'custom' ? { weeks: course.weeks } : {}),
       colorIndex: course.colorIndex
     }))
   };
@@ -340,8 +357,11 @@ function createExportPayload(state) {
 
 function parseImportText(text) {
   const source = String(text || '').replace(/^\uFEFF/, '').trim();
+  if (source.length > 1024 * 1024) throw new Error('课表内容过大');
   let raw;
-  if (codec.isShareCode(source)) {
+  if (codec.isFullBackup(source)) {
+    raw = codec.decodeFullBackup(source);
+  } else if (codec.isShareCode(source)) {
     raw = codec.decodeShareCode(source);
   } else {
     try {
@@ -354,6 +374,7 @@ function parseImportText(text) {
     return normalizeState({
       settings: raw.settings || { semester: raw.semester },
       courses: raw.courses,
+      adjustments: raw.adjustments,
       updatedAt: Date.now()
     });
   }
@@ -372,6 +393,10 @@ function parseImportText(text) {
 
 function createShareCode(state) {
   return codec.encodeShareCode(createExportPayload(state));
+}
+
+function createFullBackup(state) {
+  return codec.encodeFullBackup(createExportPayload(state));
 }
 
 function writeExportFile(state) {
@@ -394,6 +419,7 @@ module.exports = {
   mergeCourses,
   createExportPayload,
   createShareCode,
+  createFullBackup,
   parseImportText,
   writeExportFile,
   loadTitleName,

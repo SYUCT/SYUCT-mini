@@ -1,3 +1,4 @@
+<import src="../../utils/timetable-templates.wxml" />
 <view class="page timetable-page">
   <view class="timetable-hero">
     <view class="hero-topline">
@@ -8,7 +9,7 @@
       <view class="settings-button" bindtap="openSettings">设置</view>
     </view>
     <view class="hero-summary">
-      <view class="summary-main">{{weekSummaryPrefix}}：<text class="summary-week">第 {{selectedWeek}} 周</text></view>
+      <picker mode="selector" range="{{courseWeekOptions}}" value="{{selectedWeek - 1}}" bindchange="onWeekChange"><view class="summary-main summary-week-picker">{{weekSummaryPrefix}}：<text class="summary-week">第 {{selectedWeek}} 周</text><text class="week-picker-arrow">⌄</text></view></picker>
       <view class="summary-sub" wx:if="{{state.settings.firstWeekDate}}">第一周的周一 {{state.settings.firstWeekDate}}</view>
       <view class="summary-sub summary-sub-link" wx:else bindtap="openSettings">点这里填写第一周的周一日期，即可自动计算当前周 ›</view>
     </view>
@@ -40,27 +41,33 @@
   <view class="week-panel">
     <view class="week-head">
       <view class="week-head-main">
-        <view class="week-head-title">本周课程</view>
+        <view class="week-head-title">{{showOtherWeeks ? '全部课程' : '本周课程'}}</view>
         <view class="week-head-sub">{{weekCourseCount}} 个上课安排</view>
       </view>
       <view class="week-head-actions">
         <view class="grid-entry" bindtap="openGridView">全览</view>
+        <view class="grid-entry" bindtap="toggleOtherWeeks">切换</view>
         <view class="local-badge">仅存本机</view>
       </view>
     </view>
 
     <scroll-view class="weekday-scroll" scroll-x="true" enhanced="true" show-scrollbar="false">
       <view class="weekday-row">
-        <view class="weekday-item {{item.selected ? 'is-selected' : ''}} {{item.isToday ? 'is-today' : ''}}" wx:for="{{weekdays}}" wx:key="weekday" bindtap="selectWeekday" data-weekday="{{item.weekday}}">
+        <view class="weekday-item {{item.selected ? 'is-selected' : ''}} {{item.isToday ? 'is-today' : ''}}" wx:for="{{weekdays}}" wx:key="weekday" bindtap="selectWeekday" bindlongpress="openAdjustment" data-weekday="{{item.weekday}}">
           <view class="weekday-name">{{item.label}}</view>
           <view class="weekday-date">{{item.dateLabel || ' '}}</view>
+          <view class="day-status {{item.status == 'adjusted' ? 'is-adjusted' : ''}}" wx:if="{{item.statusLabel}}">{{item.statusLabel}}</view>
           <view class="weekday-count" wx:if="{{item.count}}">{{item.count}}</view>
         </view>
       </view>
     </scroll-view>
+    <view class="day-caption">
+      <view class="day-caption-copy"><text wx:if="{{selectedDay.statusLabel}}">{{selectedDay.statusLabel}} · </text><text>{{showOtherWeeks ? '含非本周课程' : '仅显示本周课程'}}</text><view class="calendar-help" wx:if="{{selectedDay.status == 'adjusted'}}">按 {{selectedDay.sourceDate}} 的课程上课</view></view>
+      <view class="day-adjust-button" bindtap="openAdjustment">调整当天课表</view>
+    </view>
 
     <view class="course-list" wx:if="{{dayCourses.length}}">
-      <view class="course-card tone-{{item.colorIndex}}" wx:for="{{dayCourses}}" wx:key="id" bindtap="editCourse" data-id="{{item.id}}">
+      <view class="course-card tone-{{item.colorIndex}} {{item.inWeek ? '' : 'is-outside'}}" wx:for="{{dayCourses}}" wx:key="id" bindtap="openDetail" bindlongpress="deleteCourseQuick" data-id="{{item.id}}">
         <view class="course-time">
           <view class="course-section-row">
             <view class="course-section">{{item.sectionLabel}}</view>
@@ -70,8 +77,9 @@
         </view>
         <view class="course-main">
           <view class="course-name">{{item.name}}</view>
-          <view class="course-meta" wx:if="{{item.metaLabel}}">{{item.metaLabel}}</view>
-          <view class="course-edit">点击可编辑</view>
+          <view class="course-meta" wx:if="{{item.room}}">课程地点：{{item.room}}</view>
+          <view class="course-meta" wx:if="{{item.teacher}}">授课教师：{{item.teacher}}</view>
+          <view class="course-edit">{{!item.inWeek ? '非本周 · ' : ''}}{{item.adjusted ? '调课 · ' : ''}}点击查看与修改</view>
         </view>
         <view class="course-current" wx:if="{{item.isCurrent}}">当前</view>
       </view>
@@ -79,9 +87,9 @@
 
     <view class="empty-state" wx:else>
       <view class="empty-icon">📅</view>
-      <view class="empty-title">这一天还没有课程</view>
-      <view class="empty-desc">可手动添加课程，或导入课表码。</view>
-      <view class="empty-actions">
+      <view class="empty-title">{{selectedDay.status == 'holiday' ? '公休日 · 今天休息' : selectedDay.status == 'suspended' ? '调课迁出 · 当天停课' : '这一天没有课程'}}</view>
+      <view class="empty-desc">{{selectedDay.status == 'holiday' ? '国家已公布的公休日自动停课，手动调课优先。' : selectedDay.status == 'suspended' ? '点击“调整当天课表”可修改或取消调课。' : '可手动添加课程，或导入课表码。'}}</view>
+      <view class="empty-actions" wx:if="{{selectedDay.status != 'holiday' && selectedDay.status != 'suspended'}}">
         <view class="empty-button primary" bindtap="openAddCourse">添加课程</view>
         <view class="empty-button" bindtap="onImport">导入课表</view>
       </view>
@@ -143,9 +151,9 @@
         <picker mode="selector" range="{{sectionPairOptions}}" value="{{courseForm.sectionPairIndex}}" bindchange="onCourseSectionPairChange">
           <view class="field-picker">{{courseForm.sectionPairDisplayLabel || sectionPairOptions[courseForm.sectionPairIndex]}}</view>
         </picker>
-        <view class="field-help" wx:if="{{courseForm.preserveOriginalSection}}">这是旧课表中的非标准节次。不修改“节次”即可原样保留；如需调整，可从上面的五组成对节次中重新选择。</view>
+        <view class="field-help" wx:if="{{courseForm.preserveOriginalSection}}">这是原课表中的非成对节次，未调整时原样保留。</view>
 
-        <view class="field-grid">
+        <view class="field-grid" wx:if="{{courseForm.weekTypeIndex != 3}}">
           <view class="field-half">
             <view class="field-label">开始周</view>
             <picker mode="selector" range="{{courseWeekOptions}}" value="{{courseForm.startWeekIndex}}" bindchange="onCourseStartWeekChange">
@@ -164,6 +172,11 @@
         <picker mode="selector" range="{{weekTypeOptions}}" value="{{courseForm.weekTypeIndex}}" bindchange="onCourseWeekTypeChange">
           <view class="field-picker">{{weekTypeOptions[courseForm.weekTypeIndex]}}</view>
         </picker>
+        <view class="custom-weeks" wx:if="{{courseForm.weekTypeIndex == 3}}">
+          <view class="custom-weeks-head"><text>已选 {{courseForm.weeks.length}} 周</text><view><text bindtap="selectAllCourseWeeks">全选</text><text bindtap="clearCourseWeeks">清空</text></view></view>
+          <view class="custom-week-grid"><view class="custom-week {{item.selected ? 'is-selected' : ''}}" wx:for="{{courseForm.weekCells}}" wx:key="week" data-week="{{item.week}}" bindtap="toggleCourseWeek">{{item.week}}</view></view>
+          <view class="field-help">点选实际开课的周，例如第 1、2、4、5、7 周。</view>
+        </view>
 
         <view class="form-actions">
           <view class="save-button" bindtap="saveCourse">保存课程</view>
@@ -203,6 +216,22 @@
 
         <view class="save-button settings-save" bindtap="saveSettings">保存设置</view>
 
+        <view class="settings-row" bindtap="toggleTimeSettings"><view><view class="settings-row-title">节次时间</view><view class="settings-row-desc">调整 1–12 节上课、下课时间</view></view><view class="settings-row-action">{{showTimeSettings ? '收起' : '修改'}}</view></view>
+        <view class="period-settings" wx:if="{{showTimeSettings}}">
+          <view class="period-time-row" wx:for="{{settingsForm.periodTimes}}" wx:key="index">
+            <text>第 {{index + 1}} 节</text>
+            <picker mode="time" value="{{item[0]}}" data-index="{{index}}" data-side="0" bindchange="onPeriodTimeChange"><view class="period-time-picker">{{item[0] || '上课'}}</view></picker>
+            <text>至</text>
+            <picker mode="time" value="{{item[1]}}" data-index="{{index}}" data-side="1" bindchange="onPeriodTimeChange"><view class="period-time-picker">{{item[1] || '下课'}}</view></picker>
+            <text class="period-clear" bindtap="clearPeriodTime" data-index="{{index}}">清空</text>
+          </view>
+          <view class="field-help" bindtap="resetPeriodTimes">恢复默认时间 ›</view>
+          <view class="field-help">第 11–12 节默认留空，请按实际作息填写，完成后点“保存设置”。</view>
+        </view>
+        <view class="settings-row" bindtap="openAdjustmentManager"><view><view class="settings-row-title">调课管理</view><view class="settings-row-desc">{{state.adjustments.length}} 条调课，点击修改或取消</view></view><view class="settings-row-action">管理</view></view>
+        <view class="settings-row" bindtap="copyFullBackup"><view><view class="settings-row-title">复制完整备份</view><view class="settings-row-desc">保留自选周次、调课与节次时间，可在 App 导入</view></view><view class="settings-row-action">复制</view></view>
+        <view class="field-help">2026 年国家公休日自动停课，手动调课优先；学校延长假期需手动调整。普通周末不一律停课。</view>
+
         <view class="settings-divider"></view>
         <view class="settings-row" bindtap="restoreHistory">
           <view>
@@ -221,4 +250,6 @@
       </scroll-view>
     </view>
   </view>
+  <template is="course-detail" data="{{detail:detail}}" />
+  <template is="adjustment-editor" data="{{showAdjustmentModal, adjustmentForm, adjustmentRecords, adjustmentMinDate, adjustmentMaxDate, adjustmentPreview}}" />
 </view>

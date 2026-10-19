@@ -1,12 +1,14 @@
 // 课表排程共用逻辑：节次时间表、周次判断与格式化。
 // 由课表列表页与周视图页共用，节次时间只维护这一份。
+const calendar = require('./timetable-calendar');
 
 const WEEKDAY_OPTIONS = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
 
 const WEEK_TYPE_OPTIONS = [
   { label: '每周', value: 'all' },
   { label: '单周', value: 'odd' },
-  { label: '双周', value: 'even' }
+  { label: '双周', value: 'even' },
+  { label: '自选周次', value: 'custom' }
 ];
 
 const PERIOD_TIME_OPTIONS = {
@@ -36,60 +38,46 @@ function formatMonthDay(date) {
 }
 
 function todayWeekday() {
-  const day = new Date().getDay();
-  return day === 0 ? 7 : day;
+  return calendar.schoolClock().weekday;
 }
 
 function calculateCurrentWeek(firstWeekDate, totalWeeks) {
-  const first = parseLocalDate(firstWeekDate);
-  if (!first) return 1;
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const raw = Math.floor((today.getTime() - first.getTime()) / 604800000) + 1;
-  if (raw < 1) return 1;
-  if (raw > totalWeeks) return totalWeeks;
-  return raw;
+  const actual = calculateActualWeek(firstWeekDate, totalWeeks, new Date());
+  if (actual !== null) return actual;
+  if (!firstWeekDate) return 1;
+  return calendar.schoolClock().date < firstWeekDate ? 1 : totalWeeks;
 }
 
 // 与 calculateCurrentWeek 的区别：超出学期范围时返回 null 而不是夹到边界，
 // 用于判断"今天到底是不是第 N 周"，不能靠夹取后的值蒙对。
 function calculateActualWeek(firstWeekDate, totalWeeks, referenceDate) {
-  const first = parseLocalDate(firstWeekDate);
-  if (!first) return null;
-  const today = new Date(referenceDate.getTime());
-  today.setHours(0, 0, 0, 0);
-  const raw = Math.floor((today.getTime() - first.getTime()) / 604800000) + 1;
+  if (!parseLocalDate(firstWeekDate)) return null;
+  const raw = calendar.weekForDate({ firstWeekDate }, calendar.schoolClock(referenceDate).date);
   if (raw < 1 || raw > totalWeeks) return null;
   return raw;
 }
 
 function clockToMinutes(value) {
-  const match = /^(\d{1,2}):(\d{2})$/.exec(String(value || ''));
-  if (!match) return null;
-  return Number(match[1]) * 60 + Number(match[2]);
+  return calendar.clockToMinutes(value);
 }
 
 function courseRunsInWeek(course, week) {
-  if (week < course.startWeek || week > course.endWeek) return false;
-  if (course.weekType === 'odd' && week % 2 === 0) return false;
-  if (course.weekType === 'even' && week % 2 !== 0) return false;
-  return true;
+  return calendar.courseRunsInWeek(course, week);
 }
 
 function courseIsCurrent(course, selectedWeek, selectedWeekday, settings, referenceDate) {
   const actualWeek = calculateActualWeek(settings.firstWeekDate, settings.totalWeeks, referenceDate);
-  const actualWeekday = referenceDate.getDay() === 0 ? 7 : referenceDate.getDay();
+  const clock = calendar.schoolClock(referenceDate);
+  const actualWeekday = clock.weekday;
   if (!actualWeek || selectedWeek !== actualWeek || selectedWeekday !== actualWeekday) return false;
-  if (course.weekday !== actualWeekday || !courseRunsInWeek(course, actualWeek)) return false;
-
-  const start = PERIOD_TIME_OPTIONS[course.startSection];
-  const end = PERIOD_TIME_OPTIONS[course.endSection];
-  if (!start || !end) return false;
-  const startMinutes = clockToMinutes(start.start);
-  const endMinutes = clockToMinutes(end.end);
-  if (startMinutes === null || endMinutes === null) return false;
-  const nowMinutes = referenceDate.getHours() * 60 + referenceDate.getMinutes();
-  return nowMinutes >= startMinutes && nowMinutes <= endMinutes;
+  if (course.weekday !== actualWeekday || course.inWeek === false || (!course.adjusted && !courseRunsInWeek(course, actualWeek))) return false;
+  const times = settings.periodTimes || calendar.DEFAULT_TIMES;
+  for (let section = course.startSection; section <= course.endSection; section += 1) {
+    const pair = times[section - 1] || [];
+    const start = clockToMinutes(pair[0]), end = clockToMinutes(pair[1]);
+    if (start !== null && end !== null && clock.minute >= start && clock.minute < end) return true;
+  }
+  return false;
 }
 
 function weekTypeLabel(value) {
@@ -101,11 +89,29 @@ function formatSectionLabel(startSection, endSection) {
   return startSection === endSection ? `${startSection}节` : `${startSection}-${endSection}节`;
 }
 
-function formatSectionTime(startSection, endSection) {
+function formatSectionTime(startSection, endSection, times) {
+  if (times) {
+    const start = times[startSection - 1], end = times[endSection - 1];
+    return start && end && start[0] && end[1] ? `${start[0]} - ${end[1]}` : '';
+  }
   const start = PERIOD_TIME_OPTIONS[startSection];
   const end = PERIOD_TIME_OPTIONS[endSection];
   if (!start || !end) return '';
   return `${start.start} - ${end.end}`;
+}
+
+function formatCourseWeeks(course) {
+  if (course.weekType === 'custom') return `第 ${(course.weeks || []).join('、')} 周`;
+  return `${course.startWeek}-${course.endWeek} 周${course.weekType === 'all' ? '' : ` · ${weekTypeLabel(course.weekType)}`}`;
+}
+
+function decorateCourse(course, week, settings, now) {
+  return { ...course,
+    sectionLabel: formatSectionLabel(course.startSection, course.endSection),
+    timeLabel: formatSectionTime(course.startSection, course.endSection, settings.periodTimes),
+    weekLabel: formatCourseWeeks(course), weekdayLabel: WEEKDAY_OPTIONS[course.weekday - 1],
+    inWeek: typeof course.inWeek === 'boolean' ? course.inWeek : courseRunsInWeek(course, week),
+    isCurrent: courseIsCurrent(course, week, course.weekday, settings, now || new Date()) };
 }
 
 // 教室名普遍是「应星楼(原6#教学楼)403」这种。全览网格空间有限，
@@ -153,11 +159,11 @@ function shortRoom(room) {
 // 周视图网格布局常量。行高用 rpx，与 timetable-grid.wxss 的 .grid-section 对应。
 const GRID_MIN_SECTIONS = 10;
 const GRID_MAX_SECTIONS = 12;
-const GRID_ROW_HEIGHT = 108;
+const GRID_ROW_HEIGHT = 128;
 
 // 网格用绝对定位而不是 CSS grid：跨节次的课要占多行高度，
 // 绝对定位可以直接用 top/height 表达，不需要维护占位表。
-function buildGrid(courses, week) {
+function buildGrid(courses, week, settings) {
   const list = Array.isArray(courses) ? courses : [];
   const maxSection = Math.min(
     GRID_MAX_SECTIONS,
@@ -166,7 +172,8 @@ function buildGrid(courses, week) {
 
   const rows = [];
   for (let section = 1; section <= maxSection; section += 1) {
-    const time = PERIOD_TIME_OPTIONS[section];
+    const pair = settings && settings.periodTimes && settings.periodTimes[section - 1];
+    const time = pair ? { start: pair[0], end: pair[1] } : PERIOD_TIME_OPTIONS[section];
     rows.push({
       section,
       startLabel: time ? time.start : '',
@@ -186,8 +193,8 @@ function buildGrid(courses, week) {
   const blocks = [];
   slots.forEach((group, key) => {
     const sorted = group.slice().sort((a, b) => {
-      const aRuns = courseRunsInWeek(a, week) ? 0 : 1;
-      const bRuns = courseRunsInWeek(b, week) ? 0 : 1;
+      const aRuns = (typeof a.inWeek === 'boolean' ? a.inWeek : courseRunsInWeek(a, week)) ? 0 : 1;
+      const bRuns = (typeof b.inWeek === 'boolean' ? b.inWeek : courseRunsInWeek(b, week)) ? 0 : 1;
       if (aRuns !== bRuns) return aRuns - bRuns;   // 本周实际上课的排在最前
       return a.endSection - b.endSection;
     });
@@ -205,7 +212,9 @@ function buildGrid(courses, week) {
       roomBuilding: room.building,
       roomNumber: room.number,
       colorIndex: primary.colorIndex,
-      inWeek: courseRunsInWeek(primary, week),
+      inWeek: typeof primary.inWeek === 'boolean' ? primary.inWeek : courseRunsInWeek(primary, week),
+      adjusted: Boolean(primary.adjusted),
+      date: primary.date || '',
       overflow: sorted.length > 1 ? sorted.length : 0,
       top: (primary.startSection - 1) * GRID_ROW_HEIGHT,
       height: span * GRID_ROW_HEIGHT
@@ -233,6 +242,8 @@ module.exports = {
   weekTypeLabel,
   formatSectionLabel,
   formatSectionTime,
+  formatCourseWeeks,
+  decorateCourse,
   shortRoom,
   buildGrid
 };

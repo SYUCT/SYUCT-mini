@@ -214,7 +214,23 @@ def check_wxml_handlers() -> None:
         js_path = wxml_path.with_suffix('.js')
         if not js_path.exists():
             continue
-        handlers = extract_handlers(wxml_path.read_text(encoding='utf-8'))
+        sources = []
+        seen = set()
+
+        def read_templates(template_path: Path) -> None:
+            template_path = template_path.resolve()
+            if template_path in seen:
+                return
+            if ROOT.resolve() not in template_path.parents or not template_path.exists():
+                fail(f'WXML 引用不存在或越过运行目录：{template_path}')
+            seen.add(template_path)
+            source = template_path.read_text(encoding='utf-8')
+            sources.append(source)
+            for imported in re.findall(r'<(?:import|include)\b[^>]*\bsrc=[\'"]([^\'"]+)[\'"]', source):
+                read_templates(template_path.parent / imported)
+
+        read_templates(wxml_path)
+        handlers = extract_handlers('\n'.join(sources))
         js_text = collect_local_js_source(js_path)
         for handler in handlers:
             if not re.search(rf'\b{re.escape(handler)}\s*\(', js_text):
@@ -264,6 +280,9 @@ def check_timetable_feature() -> None:
         'pages/timetable/timetable.wxss',
         'utils/timetable-store.js',
         'utils/timetable-codec.js',
+        'utils/timetable-calendar.js',
+        'utils/timetable-adjustment-page.js',
+        'utils/timetable-templates.wxml',
     ]
     for rel in required_files:
         if not ROOT.joinpath(rel).exists():

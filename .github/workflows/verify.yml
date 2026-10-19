@@ -19,6 +19,7 @@ jobs:
         run: |
           node scripts/test-timetable.js
           node scripts/test-app-link.js
+          node --test scripts/test-timetable-calendar.js
 
       - name: 安装校验依赖
         run: |

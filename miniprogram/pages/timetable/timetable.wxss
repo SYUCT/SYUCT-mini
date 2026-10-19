@@ -1,10 +1,12 @@
+@import "../../utils/timetable-common.wxss";
+
 .timetable-page {
   padding-bottom: 40rpx;
 }
 
 .timetable-hero {
-  margin: 24rpx;
-  padding: 32rpx;
+  margin: 20rpx 24rpx 16rpx;
+  padding: 24rpx;
   border-radius: 28rpx;
   color: #fff;
   background: linear-gradient(145deg, #063f72, #075ca8 62%, #1f6feb);
@@ -25,14 +27,15 @@
 }
 
 .hero-title {
-  font-size: 46rpx;
+  font-size: 36rpx;
   line-height: 1.25;
   font-weight: 800;
   margin-top: 4rpx;
 }
 
 .settings-button {
-  padding: 10rpx 22rpx;
+  padding: 16rpx 24rpx;
+  flex-shrink: 0;
   border-radius: 999rpx;
   background: rgba(255, 255, 255, 0.16);
   font-size: 24rpx;
@@ -40,8 +43,8 @@
 }
 
 .hero-summary {
-  margin-top: 28rpx;
-  padding-top: 24rpx;
+  margin-top: 14rpx;
+  padding-top: 14rpx;
   border-top: 1rpx solid rgba(255, 255, 255, 0.2);
 }
 
@@ -51,9 +54,13 @@
 }
 
 .summary-week {
-  font-size: 36rpx;
+  font-size: 32rpx;
   font-weight: 800;
+  white-space: nowrap;
 }
+
+.summary-week-picker { display: flex; align-items: center; white-space: nowrap; }
+.week-picker-arrow { margin-left: 14rpx; opacity: .75; }
 
 .summary-sub {
   margin-top: 6rpx;
@@ -76,7 +83,7 @@
 .week-controls {
   display: flex;
   gap: 12rpx;
-  margin-top: 24rpx;
+  margin-top: 14rpx;
 }
 
 .week-button,
@@ -194,7 +201,7 @@
 
 /* 跳周视图的入口：视图切换，与添加/导入/分享那三个动作卡片区分开 */
 .grid-entry {
-  padding: 5rpx 16rpx;
+  padding: 12rpx 18rpx;
   border-radius: 999rpx;
   background: rgba(7, 92, 168, 0.08);
   color: var(--primary);
@@ -295,7 +302,7 @@
 }
 
 .course-time {
-  width: 230rpx;
+  width: 176rpx;
   flex-shrink: 0;
 }
 
@@ -661,6 +668,8 @@
   padding: 18rpx 22rpx;
   min-height: 88rpx;
   box-sizing: border-box;
+  width: 100%;
+  border: none;
   border-radius: 14rpx;
   color: #fff;
   background: var(--primary);
@@ -670,3 +679,24 @@
   text-align: center;
 }
 .data-note-download::after { border: none; }
+
+.hero-topline > view:first-child { min-width: 0; }
+.hero-title { overflow-wrap: break-word; }
+.weekday-row { display: flex; padding: 12rpx 10rpx; gap: 0; }
+.weekday-item { width: 14.285714%; flex-shrink: 0; min-height: 104rpx; }
+.weekday-item.is-selected .day-status { color: #fff1cb; }
+.day-caption { display: flex; align-items: center; justify-content: space-between; padding: 18rpx 20rpx 0; gap: 16rpx; }
+.day-caption-copy { color: #71859a; font-size: 22rpx; min-width: 0; }
+.day-adjust-button { flex-shrink: 0; color: #075ca8; background: #edf4ff; padding: 14rpx 18rpx; font-size: 23rpx; border-radius: 14rpx; }
+.course-card.is-outside { opacity: .6; filter: saturate(.35); }
+.course-meta { overflow-wrap: break-word; white-space: normal; }
+.course-weeks { white-space: normal; overflow-wrap: break-word; }
+.custom-weeks { margin-top: 18rpx; padding: 20rpx; background: #f2f7ff; border-radius: 20rpx; }
+.custom-weeks-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16rpx; color: #50718c; font-size: 24rpx; }
+.custom-weeks-head text { padding: 10rpx; }
+.custom-week-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12rpx; }
+.custom-week { display: flex; align-items: center; justify-content: center; min-height: 72rpx; border: 1rpx solid #cfddee; border-radius: 14rpx; background: #fff; color: #456784; font-size: 27rpx; font-weight: 700; }
+.custom-week.is-selected { color: #fff; border-color: #075ca8; background: linear-gradient(135deg, #075ca8, #377ae1); box-shadow: 0 4rpx 12rpx rgba(7, 92, 168, .15); }
+.period-time-row { display: flex; align-items: center; justify-content: space-between; gap: 8rpx; margin: 16rpx 0; font-size: 24rpx; }
+.period-time-picker { min-width: 100rpx; padding: 12rpx 10rpx; text-align: center; border-radius: 12rpx; background: #edf4ff; color: #075ca8; }
+.period-clear { color: #8c6972; padding: 12rpx 0; }

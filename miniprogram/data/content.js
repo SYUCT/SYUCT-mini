@@ -22,7 +22,9 @@ const COMMUNITY_GROUPS = [
 ];
 
 const SITE = {
-  version: 'v1.5.0-mini',
+  version: 'v1.6.0-mini',
+  timetableVersion: '0.2.23-alpha1',
+  timetableUpdatedAt: '2026-10-19',
   sourceVersion: 'v260901',
   sourceRevision: '20260901',
   updatedAt: '2026-09-01',

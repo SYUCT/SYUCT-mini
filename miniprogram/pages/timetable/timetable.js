@@ -2,18 +2,17 @@ const store = require('../../utils/timetable-store');
 const { withShare } = require('../../utils/share');
 const { searchCoursePresets } = require('../../data/timetable-course-presets');
 const { SITE } = require('../../data/content');
+const calendar = require('../../utils/timetable-calendar');
+const adjustments = require('../../utils/timetable-adjustment-page');
 const SHARE_TITLE = 'SYUCT 校园指南 · 我的课表';
 
 const {
   WEEKDAY_OPTIONS,
   WEEK_TYPE_OPTIONS,
-  parseLocalDate,
-  formatMonthDay,
   todayWeekday,
   calculateCurrentWeek,
   courseRunsInWeek,
-  courseIsCurrent,
-  weekTypeLabel,
+  decorateCourse,
   formatSectionLabel,
   formatSectionTime
 } = require('../../utils/timetable-schedule');
@@ -22,13 +21,14 @@ const SECTION_PAIR_OPTIONS = [
   { label: '3-4节', startSection: 3, endSection: 4 },
   { label: '5-6节', startSection: 5, endSection: 6 },
   { label: '7-8节', startSection: 7, endSection: 8 },
-  { label: '9-10节', startSection: 9, endSection: 10 }
-].map((item) => ({
-  ...item,
-  timeLabel: formatSectionTime(item.startSection, item.endSection),
-  pickerLabel: `${item.label}（${formatSectionTime(item.startSection, item.endSection)}）`
-}));
-const SECTION_PAIR_LABELS = SECTION_PAIR_OPTIONS.map((item) => item.pickerLabel);
+  { label: '9-10节', startSection: 9, endSection: 10 },
+  { label: '11-12节', startSection: 11, endSection: 12 }
+];
+function sectionPickerLabel(pair, times) {
+  const time = formatSectionTime(pair.startSection, pair.endSection, times);
+  return time ? `${pair.label}（${time}）` : `${pair.label}（时间未设置）`;
+}
+const SECTION_PAIR_LABELS = SECTION_PAIR_OPTIONS.map((item) => sectionPickerLabel(item));
 const TOTAL_WEEK_OPTIONS = Array.from({ length: 30 }, (_, index) => `${index + 1} 周`);
 const COURSE_WEEK_OPTIONS = Array.from({ length: 30 }, (_, index) => `${index + 1} 周`);
 
@@ -41,12 +41,12 @@ function findSectionPairIndex(startSection, endSection) {
   return SECTION_PAIR_OPTIONS.findIndex((item) => item.startSection === startSection && item.endSection === endSection);
 }
 
-function createSectionFormState(startSection, endSection) {
+function createSectionFormState(startSection, endSection, times) {
   const pairIndex = findSectionPairIndex(startSection, endSection);
   if (pairIndex >= 0) {
     return {
       sectionPairIndex: pairIndex,
-      sectionPairDisplayLabel: SECTION_PAIR_OPTIONS[pairIndex].pickerLabel,
+      sectionPairDisplayLabel: sectionPickerLabel(SECTION_PAIR_OPTIONS[pairIndex], times),
       preserveOriginalSection: false,
       originalStartSection: startSection,
       originalEndSection: endSection
@@ -61,7 +61,7 @@ function createSectionFormState(startSection, endSection) {
   };
 }
 
-function emptyCourseForm(totalWeeks) {
+function emptyCourseForm(totalWeeks, times) {
   return {
     id: '',
     name: '',
@@ -69,18 +69,21 @@ function emptyCourseForm(totalWeeks) {
     room: '',
     weekdayIndex: Math.max(0, todayWeekday() - 1),
     sectionPairIndex: 0,
-    sectionPairDisplayLabel: SECTION_PAIR_OPTIONS[0].pickerLabel,
+    sectionPairDisplayLabel: sectionPickerLabel(SECTION_PAIR_OPTIONS[0], times),
     preserveOriginalSection: false,
     originalStartSection: 1,
     originalEndSection: 2,
     startWeekIndex: 0,
     endWeekIndex: Math.max(0, Math.min(totalWeeks || 20, 30) - 1),
-    weekTypeIndex: 0
+    weekTypeIndex: 0,
+    weeks: [],
+    weekCells: []
   };
 }
 
 Page(Object.assign({
   data: {
+    ...adjustments.data,
     state: store.defaultState(),
     heroTitle: '我的化大课表',
     selectedWeek: 1,
@@ -89,6 +92,9 @@ Page(Object.assign({
     selectedWeekday: todayWeekday(),
     weekdays: [],
     dayCourses: [],
+    selectedDay: {},
+    detail: null,
+    showOtherWeeks: false,
     weekCourseCount: 0,
     weekdayOptions: WEEKDAY_OPTIONS,
     sectionPairOptions: SECTION_PAIR_LABELS,
@@ -116,6 +122,14 @@ Page(Object.assign({
   onShow() {
     this.reloadState(false);
     this.consumePendingEdit();
+    clearInterval(this.__clockTimer);
+    this.__clockTimer = setInterval(() => this.refreshSchedule(), 30000);
+  },
+  onHide() { clearInterval(this.__clockTimer); },
+  onUnload() { clearInterval(this.__clockTimer); },
+
+  onScheduleSaved(state) {
+    this.setData({ state, detail: null, historyCount: store.getHistory().length }, () => this.refreshSchedule());
   },
 
   // 周视图跳回来时带的待编辑课程 id（switchTab 无法传参，只能走 globalData）
@@ -138,6 +152,8 @@ Page(Object.assign({
       heroTitle: formatHeroTitle(titleName),
       currentWeek,
       selectedWeek,
+      courseWeekOptions: COURSE_WEEK_OPTIONS.slice(0, state.settings.totalWeeks),
+      sectionPairOptions: SECTION_PAIR_OPTIONS.map((pair) => sectionPickerLabel(pair, state.settings.periodTimes)),
       historyCount: store.getHistory().length
     }, () => this.refreshSchedule());
   },
@@ -146,51 +162,27 @@ Page(Object.assign({
     const state = this.data.state;
     const selectedWeek = this.data.selectedWeek;
     const selectedWeekday = this.data.selectedWeekday;
-    const first = parseLocalDate(state.settings.firstWeekDate);
     const referenceDate = new Date();
-    const today = new Date(referenceDate.getTime());
-    today.setHours(0, 0, 0, 0);
-
-    const weekdays = WEEKDAY_OPTIONS.map((label, index) => {
-      let dateLabel = '';
-      let isToday = false;
-      if (first) {
-        const date = new Date(first.getTime());
-        date.setDate(date.getDate() + (selectedWeek - 1) * 7 + index);
-        dateLabel = formatMonthDay(date);
-        isToday = date.getTime() === today.getTime();
-      }
-      const weekday = index + 1;
-      const count = state.courses.filter((course) => course.weekday === weekday && courseRunsInWeek(course, selectedWeek)).length;
-      return {
-        weekday,
-        label: label.replace('周', ''),
-        dateLabel,
-        isToday,
-        selected: weekday === selectedWeekday,
-        count
-      };
-    });
-
-    const dayCourses = state.courses
-      .filter((course) => course.weekday === selectedWeekday && courseRunsInWeek(course, selectedWeek))
+    const weekdays = calendar.weekDays(state, selectedWeek, this.data.showOtherWeeks, referenceDate)
+      .map((day) => ({ ...day, label: day.label.replace('周', ''), selected: day.weekday === selectedWeekday }));
+    const selectedDay = weekdays[selectedWeekday - 1];
+    const dayCourses = selectedDay.visibleCourses
       .slice()
       .sort((a, b) => a.startSection - b.startSection)
       .map((course) => ({
-        ...course,
-        sectionLabel: formatSectionLabel(course.startSection, course.endSection),
-        timeLabel: formatSectionTime(course.startSection, course.endSection),
-        weekLabel: `${course.startWeek}-${course.endWeek} 周${course.weekType === 'all' ? '' : ` · ${weekTypeLabel(course.weekType)}`}`,
-        metaLabel: [course.teacher, course.room].filter(Boolean).join(' · '),
-        isCurrent: courseIsCurrent(course, selectedWeek, selectedWeekday, state.settings, referenceDate)
+        ...decorateCourse(course, selectedWeek, state.settings, referenceDate)
       }));
-
-    const weekCourseCount = state.courses.filter((course) => courseRunsInWeek(course, selectedWeek)).length;
+    const weekCourseCount = weekdays.reduce((sum, day) => sum + day.count, 0);
     const weekSummaryPrefix = selectedWeek === this.data.currentWeek ? '本周为' : '正在查看';
-    this.setData({ weekdays, dayCourses, weekCourseCount, weekSummaryPrefix });
+    this.setData({ weekdays, selectedDay, dayCourses, weekCourseCount, weekSummaryPrefix,
+      currentWeek: calculateCurrentWeek(state.settings.firstWeekDate, state.settings.totalWeeks) });
   },
 
+  toggleOtherWeeks() { this.setData({ showOtherWeeks: !this.data.showOtherWeeks }, () => this.refreshSchedule()); },
+  onWeekChange(e) { this.setData({ selectedWeek: Number(e.detail.value) + 1 }, () => this.refreshSchedule()); },
+
   selectWeekday(e) {
+    if (Number(e.currentTarget.dataset.weekday) === this.data.selectedWeekday) { this.openAdjustment(e); return; }
     this.setData({ selectedWeekday: Number(e.currentTarget.dataset.weekday) }, () => this.refreshSchedule());
   },
 
@@ -209,23 +201,39 @@ Page(Object.assign({
   },
 
   openAddCourse() {
+    const form = emptyCourseForm(this.data.state.settings.totalWeeks, this.data.state.settings.periodTimes);
+    form.weekCells = this.weekCells([]);
     this.setData({
       showCourseModal: true,
       isEditingCourse: false,
       courseNameSuggestions: [],
-      courseForm: emptyCourseForm(this.data.state.settings.totalWeeks)
+      courseForm: form
     });
   },
 
   editCourse(e) {
+    this.setData({ detail: null });
     this.openCourseEditor(e.currentTarget.dataset.id);
+  },
+
+  openDetail(e) {
+    const course = this.data.dayCourses.find((c) => c.id === e.currentTarget.dataset.id);
+    if (course) this.setData({ detail: { courses: [course] } });
+  },
+  closeDetail() { this.setData({ detail: null }); },
+  deleteCourseQuick(e) {
+    this.setData({ 'courseForm.id': e.currentTarget.dataset.id });
+    this.deleteCourse();
+  },
+  weekCells(weeks) {
+    return Array.from({ length: this.data.state.settings.totalWeeks }, (_, index) => ({ week: index + 1, selected: weeks.includes(index + 1) }));
   },
 
   openCourseEditor(id) {
     const course = this.data.state.courses.find((item) => item.id === id);
     if (!course) return;
     const weekTypeIndex = Math.max(0, WEEK_TYPE_OPTIONS.findIndex((item) => item.value === course.weekType));
-    const sectionFormState = createSectionFormState(course.startSection, course.endSection);
+    const sectionFormState = createSectionFormState(course.startSection, course.endSection, this.data.state.settings.periodTimes);
     this.setData({
       showCourseModal: true,
       isEditingCourse: true,
@@ -239,7 +247,9 @@ Page(Object.assign({
         ...sectionFormState,
         startWeekIndex: course.startWeek - 1,
         endWeekIndex: course.endWeek - 1,
-        weekTypeIndex
+        weekTypeIndex,
+        weeks: course.weeks || [],
+        weekCells: this.weekCells(course.weeks || [])
       }
     });
   },
@@ -279,13 +289,35 @@ Page(Object.assign({
     const sectionPair = SECTION_PAIR_OPTIONS[sectionPairIndex] || SECTION_PAIR_OPTIONS[0];
     this.setData({
       'courseForm.sectionPairIndex': sectionPairIndex,
-      'courseForm.sectionPairDisplayLabel': sectionPair.pickerLabel,
+      'courseForm.sectionPairDisplayLabel': sectionPickerLabel(sectionPair, this.data.state.settings.periodTimes),
       'courseForm.preserveOriginalSection': false
     });
   },
   onCourseStartWeekChange(e) { this.setData({ 'courseForm.startWeekIndex': Number(e.detail.value) }); },
   onCourseEndWeekChange(e) { this.setData({ 'courseForm.endWeekIndex': Number(e.detail.value) }); },
-  onCourseWeekTypeChange(e) { this.setData({ 'courseForm.weekTypeIndex': Number(e.detail.value) }); },
+  onCourseWeekTypeChange(e) {
+    const index = Number(e.detail.value), form = this.data.courseForm;
+    let weeks = form.weeks || [];
+    if (index === 3 && !weeks.length) {
+      const course = { startWeek: form.startWeekIndex + 1, endWeek: form.endWeekIndex + 1,
+        weekType: WEEK_TYPE_OPTIONS[form.weekTypeIndex].value };
+      weeks = Array.from({ length: this.data.state.settings.totalWeeks }, (_, i) => i + 1).filter((w) => courseRunsInWeek(course, w));
+    }
+    this.setData({ 'courseForm.weekTypeIndex': index, 'courseForm.weeks': weeks, 'courseForm.weekCells': this.weekCells(weeks) });
+  },
+  toggleCourseWeek(e) {
+    const week = Number(e.currentTarget.dataset.week);
+    const weeks = (this.data.courseForm.weeks || []).slice();
+    const index = weeks.indexOf(week);
+    if (index < 0) weeks.push(week); else weeks.splice(index, 1);
+    weeks.sort((a, b) => a - b);
+    this.setData({ 'courseForm.weeks': weeks, 'courseForm.weekCells': this.weekCells(weeks) });
+  },
+  selectAllCourseWeeks() {
+    const weeks = Array.from({ length: this.data.state.settings.totalWeeks }, (_, i) => i + 1);
+    this.setData({ 'courseForm.weeks': weeks, 'courseForm.weekCells': this.weekCells(weeks) });
+  },
+  clearCourseWeeks() { this.setData({ 'courseForm.weeks': [], 'courseForm.weekCells': this.weekCells([]) }); },
 
   saveCourse() {
     const form = this.data.courseForm;
@@ -298,8 +330,10 @@ Page(Object.assign({
     const keepOriginalSection = this.data.isEditingCourse && form.preserveOriginalSection;
     const startSection = keepOriginalSection ? form.originalStartSection : sectionPair.startSection;
     const endSection = keepOriginalSection ? form.originalEndSection : sectionPair.endSection;
-    const startWeek = form.startWeekIndex + 1;
-    const endWeek = form.endWeekIndex + 1;
+    const custom = form.weekTypeIndex === 3;
+    if (custom && !form.weeks.length) { wx.showToast({ title: '请至少选择一周', icon: 'none' }); return; }
+    const startWeek = custom ? form.weeks[0] : form.startWeekIndex + 1;
+    const endWeek = custom ? form.weeks[form.weeks.length - 1] : form.endWeekIndex + 1;
     if (endWeek < startWeek) {
       wx.showToast({ title: '结束周不能早于开始周', icon: 'none' });
       return;
@@ -317,8 +351,12 @@ Page(Object.assign({
       startWeek,
       endWeek,
       weekType: (WEEK_TYPE_OPTIONS[form.weekTypeIndex] || WEEK_TYPE_OPTIONS[0]).value,
+      ...(custom ? { weeks: form.weeks.slice() } : {}),
       colorIndex: 0
     };
+    if (!Array.from({ length: endWeek - startWeek + 1 }, (_, i) => i + startWeek).some((w) => courseRunsInWeek(course, w))) {
+      wx.showToast({ title: '所选范围没有符合单双周的课程', icon: 'none' }); return;
+    }
     if (this.data.isEditingCourse) {
       const index = state.courses.findIndex((item) => item.id === course.id);
       if (index < 0) {
@@ -375,8 +413,10 @@ Page(Object.assign({
         titleName: store.loadTitleName(),
         semester: settings.semester,
         firstWeekDate: settings.firstWeekDate,
-        totalWeeksIndex: Math.max(0, settings.totalWeeks - 1)
-      }
+        totalWeeksIndex: Math.max(0, settings.totalWeeks - 1),
+        periodTimes: settings.periodTimes.map((pair) => pair.slice())
+      },
+      showTimeSettings: false
     });
   },
 
@@ -391,14 +431,24 @@ Page(Object.assign({
   onSemesterInput(e) { this.setData({ 'settingsForm.semester': e.detail.value }); },
   onFirstWeekDateChange(e) { this.setData({ 'settingsForm.firstWeekDate': e.detail.value }); },
   onTotalWeeksChange(e) { this.setData({ 'settingsForm.totalWeeksIndex': Number(e.detail.value) }); },
+  toggleTimeSettings() { this.setData({ showTimeSettings: !this.data.showTimeSettings }); },
+  onPeriodTimeChange(e) {
+    this.setData({ [`settingsForm.periodTimes[${Number(e.currentTarget.dataset.index)}][${Number(e.currentTarget.dataset.side)}]`]: e.detail.value });
+  },
+  clearPeriodTime(e) { this.setData({ [`settingsForm.periodTimes[${Number(e.currentTarget.dataset.index)}]`]: ['', ''] }); },
+  resetPeriodTimes() { this.setData({ 'settingsForm.periodTimes': calendar.validateTimes() }); },
 
   saveSettings() {
     const form = this.data.settingsForm;
     const state = store.normalizeState(this.data.state);
+    if (state.adjustments.length && form.firstWeekDate !== state.settings.firstWeekDate) {
+      wx.showToast({ title: '请先取消现有调课，再更改第一周日期', icon: 'none' }); return;
+    }
     state.settings = {
       semester: String(form.semester || '').trim() || '当前学期',
       firstWeekDate: form.firstWeekDate || '',
-      totalWeeks: form.totalWeeksIndex + 1
+      totalWeeks: form.totalWeeksIndex + 1,
+      periodTimes: form.periodTimes
     };
     try {
       const saved = store.saveState(state);
@@ -409,6 +459,8 @@ Page(Object.assign({
         heroTitle: formatHeroTitle(titleName),
         currentWeek,
         selectedWeek: currentWeek,
+        courseWeekOptions: COURSE_WEEK_OPTIONS.slice(0, saved.settings.totalWeeks),
+        sectionPairOptions: SECTION_PAIR_OPTIONS.map((pair) => sectionPickerLabel(pair, saved.settings.periodTimes)),
         showSettingsModal: false,
         historyCount: store.getHistory().length
       }, () => this.refreshSchedule());
@@ -448,7 +500,7 @@ Page(Object.assign({
 
   onImport() {
     wx.showActionSheet({
-      itemList: ['复制课表转换链接（首次使用）', '从剪贴板导入课表码（推荐）', '从微信聊天选择 JSON 文件'],
+      itemList: ['复制课表转换链接（首次使用）', '从剪贴板导入课表码 / 完整备份', '从微信聊天选择 JSON 文件'],
       success: (res) => {
         if (res.tapIndex === 0) this.copyTimetableConverterLink();
         if (res.tapIndex === 1) this.importFromClipboard();
@@ -521,7 +573,7 @@ Page(Object.assign({
         const label = mode === 'replace' ? '覆盖' : '合并';
         wx.showModal({
           title: `导入 ${incoming.courses.length} 门课程`,
-          content: `学期：${incoming.settings.semester || '未填写'}\n将以“${label}”方式导入，操作前会自动保存本地历史备份。`,
+          content: `学期：${incoming.settings.semester || '未填写'}\n含 ${incoming.adjustments.length} 条调课。将以“${label}”方式导入，操作前会保存本地历史备份。${mode === 'merge' ? '\n合并保留当前学期与节次时间；换机完整恢复建议选择覆盖。' : ''}`,
           confirmText: '确认导入',
           success: (modalRes) => {
             if (!modalRes.confirm) return;
@@ -544,6 +596,13 @@ Page(Object.assign({
       // 导入的 totalWeeks 偏小会让超出范围的周次再也翻不到。
       if (!next.settings.firstWeekDate && incoming.settings.firstWeekDate) {
         next.settings.firstWeekDate = incoming.settings.firstWeekDate;
+      }
+      if (incoming.adjustments.length) {
+        if (next.settings.firstWeekDate !== incoming.settings.firstWeekDate) {
+          wx.showToast({ title: '两份课表第一周日期不同，无法合并调课', icon: 'none' }); return;
+        }
+        const seen = new Set(next.adjustments.map((a) => JSON.stringify(a)));
+        next.adjustments = next.adjustments.concat(incoming.adjustments.filter((a) => !seen.has(JSON.stringify(a))));
       }
     }
     let saved;
@@ -580,11 +639,11 @@ Page(Object.assign({
       return;
     }
     wx.showActionSheet({
-      itemList: ['发送 JSON 文件给同学', '复制课表码（推荐）', '复制原始 JSON（兼容）'],
+      itemList: ['发送完整 JSON 文件', '复制课表码（普通课程）', '复制完整备份（含调课）'],
       success: (res) => {
         if (res.tapIndex === 0) this.shareJsonFile();
         if (res.tapIndex === 1) this.copyShareCode();
-        if (res.tapIndex === 2) this.copyJsonBackup();
+        if (res.tapIndex === 2) this.copyFullBackup();
       }
     });
   },
@@ -593,13 +652,13 @@ Page(Object.assign({
     try {
       const filePath = store.writeExportFile(this.data.state);
       if (typeof wx.shareFileMessage !== 'function') {
-        this.copyShareCode('当前微信版本不支持文件转发，已复制课表码');
+        this.copyFullBackup('当前微信版本不支持文件转发，已复制完整备份');
         return;
       }
       wx.shareFileMessage({
         filePath,
         fileName: `SYUCT课表-${this.data.state.settings.semester}.json`,
-        fail: () => this.copyShareCode('文件转发失败，已改为复制课表码')
+        fail: () => this.copyFullBackup('文件转发失败，已复制完整备份')
       });
     } catch (e) {
       wx.showToast({ title: '生成课表文件失败', icon: 'none' });
@@ -607,6 +666,13 @@ Page(Object.assign({
   },
 
   copyShareCode(message) {
+    const state = this.data.state;
+    const hasAdvancedSettings = state.adjustments.length || JSON.stringify(state.settings.periodTimes) !== JSON.stringify(calendar.DEFAULT_TIMES);
+    if (!message && hasAdvancedSettings) {
+      wx.showModal({ title: '普通课表码仅含课程', content: '自选周次会保留，但调课记录与自定义节次时间需要完整备份。', confirmText: '仍然复制', cancelText: '完整备份',
+        success: (res) => { if (res.confirm) this.copyShareCode('普通课表码已复制'); else if (res.cancel) this.copyFullBackup(); } });
+      return;
+    }
     let code;
     try {
       code = store.createShareCode(this.data.state);
@@ -622,14 +688,10 @@ Page(Object.assign({
     });
   },
 
-  copyJsonBackup(message) {
-    const text = JSON.stringify(store.createExportPayload(this.data.state));
-    wx.setClipboardData({
-      data: text,
-      success: () => {
-        if (message) wx.showToast({ title: message, icon: 'none', duration: 2200 });
-      }
-    });
+  copyFullBackup(message) {
+    try {
+      wx.setClipboardData({ data: store.createFullBackup(this.data.state), success: () => wx.showToast({ title: typeof message === 'string' ? message : '完整备份已复制，可在 App 或小程序导入', icon: 'none', duration: 2400 }) });
+    } catch (e) { wx.showToast({ title: e.message || '备份失败', icon: 'none' }); }
   },
 
   openGridView() {
@@ -644,4 +706,4 @@ Page(Object.assign({
   },
 
   preventBubble() {}
-}, withShare({ shareApp: { title: SHARE_TITLE }, shareTimeline: { title: SHARE_TITLE } })));
+}, adjustments.methods, withShare({ shareApp: { title: SHARE_TITLE }, shareTimeline: { title: SHARE_TITLE } })));
